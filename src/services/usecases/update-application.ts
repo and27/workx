@@ -5,7 +5,7 @@ import {
   applicationRepository,
   applicationUpdatePatch,
 } from "@/src/ports/application-repository";
-import { dateOnly } from "@/src/domain/types/date-only";
+import { dateOnly, isDateOnly } from "@/src/domain/types/date-only";
 import { applicationStatus } from "@/src/domain/types/application-status";
 import { priority } from "@/src/domain/types/priority";
 import { toIsoNow } from "@/src/services/usecases/date-only";
@@ -106,6 +106,9 @@ export const updateApplicationUseCase =
       const current = existing.nextActionAt;
       const next = input.nextActionAt;
       if (current !== next) {
+        if (next !== null && !isDateOnly(next)) {
+          throw new Error(`Invalid date-only value: ${next}`);
+        }
         patch.nextActionAt = next ?? null;
         logs.push(
           buildLogEntry(
