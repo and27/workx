@@ -1,65 +1,129 @@
-import Image from "next/image";
+import { repositories } from "@/src/composition/repositories";
+import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 
-export default function Home() {
+const listInbox = createListInboxUseCase({
+  applicationRepository: repositories.applicationRepository,
+});
+
+export default async function Home() {
+  const { overdue } = await listInbox();
+  const applications = await repositories.applicationRepository.list({});
+  const totalApplications = applications.length;
+  const activeInterviews = applications.filter(
+    (item) => item.status === "screen" || item.status === "tech"
+  ).length;
+  const overdueCount = overdue.length;
+  const thisWeek = applications.filter((item) => {
+    if (!item.updatedAt) {
+      return false;
+    }
+    const updated = new Date(item.updatedAt);
+    const now = new Date();
+    const diffDays = Math.floor(
+      (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return diffDays <= 7;
+  }).length;
+
+  const jobs = await repositories.jobRepository.list({});
+  const recentLogs =
+    applications.length > 0
+      ? await repositories.applicationLogRepository.listByApplicationId({
+          applicationId: applications[0].id,
+        })
+      : [];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="space-y-8">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Descubre, prioriza y da seguimiento a tus postulaciones.
+        </p>
+      </header>
+
+      <section className="grid gap-4 md:grid-cols-4">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Total postulaciones</p>
+          <p className="text-2xl font-semibold">{totalApplications}</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Entrevistas activas</p>
+          <p className="text-2xl font-semibold">{activeInterviews}</p>
         </div>
-      </main>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Acciones vencidas</p>
+          <p className="text-2xl font-semibold">{overdueCount}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Postulaciones semana</p>
+          <p className="text-2xl font-semibold">{thisWeek}</p>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Top matches hoy</h2>
+          <span className="text-xs text-muted-foreground">Basado en recientes</span>
+        </div>
+        <div className="overflow-hidden rounded-lg border border-border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2">Rol</th>
+                <th className="px-3 py-2">Empresa</th>
+                <th className="px-3 py-2">Fuente</th>
+                <th className="px-3 py-2">Accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {jobs.slice(0, 5).map((job) => (
+                <tr key={job.id} className="border-t border-border">
+                  <td className="px-3 py-2">{job.role}</td>
+                  <td className="px-3 py-2">{job.company}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{job.source}</td>
+                  <td className="px-3 py-2">
+                    <button className="rounded-md border border-border px-3 py-1 text-xs hover:bg-muted">
+                      Guardar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {jobs.length === 0 && (
+                <tr>
+                  <td className="px-3 py-4 text-sm text-muted-foreground" colSpan={4}>
+                    Sin trabajos para mostrar.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Actividad reciente</h2>
+          <span className="text-xs text-muted-foreground">Ultimos eventos</span>
+        </div>
+        <div className="rounded-lg border border-border">
+          <ul className="divide-y divide-border text-sm">
+            {recentLogs.slice(0, 6).map((entry) => (
+              <li key={entry.id} className="px-4 py-3">
+                <p className="text-sm">{entry.message}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(entry.createdAt).toLocaleDateString("es-MX")}
+                </p>
+              </li>
+            ))}
+            {recentLogs.length === 0 && (
+              <li className="px-4 py-3 text-sm text-muted-foreground">
+                Sin actividad reciente.
+              </li>
+            )}
+          </ul>
+        </div>
+      </section>
     </div>
   );
 }
