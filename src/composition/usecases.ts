@@ -22,6 +22,7 @@ export const listJobs = createListJobsUseCase({
 
 export const ingestJobs = createIngestJobsUseCase({
   jobSource: repositories.jobSource,
+  jobRepository: repositories.jobRepository,
 });
 
 export const createApplicationFromJob = createApplicationFromJobUseCase({

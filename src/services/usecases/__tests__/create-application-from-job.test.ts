@@ -13,9 +13,12 @@ const makeJob = (overrides: Partial<job>): job => ({
   company: "Acme",
   role: "Engineer",
   source: "LinkedIn",
+  sourceUrl: null,
+  externalId: null,
   location: "Remoto",
   seniority: "Mid",
   tags: ["React"],
+  publishedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   ...overrides,
@@ -33,6 +36,9 @@ describe("createApplicationFromJob", () => {
       },
       async getById(query) {
         return jobs.find((job) => job.id === query.id) ?? null;
+      },
+      async upsertByExternalId() {
+        return { created: 0, updated: 0 };
       },
     };
 

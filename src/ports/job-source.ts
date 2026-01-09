@@ -1,3 +1,5 @@
+import { isoDateTime } from "@/src/domain/types/iso-date-time";
+
 export type jobSourceQuery = {
   source?: string;
   limit?: number;
@@ -12,7 +14,7 @@ export type jobSourceRecord = {
   seniority: string;
   tags: string[];
   sourceUrl: string;
-  publishedAt: string;
+  publishedAt: isoDateTime | null;
 };
 
 export type jobSource = {

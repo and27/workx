@@ -5,9 +5,12 @@ export type job = {
   company: string;
   role: string;
   source: string;
+  sourceUrl: string | null;
+  externalId: string | null;
   location: string;
   seniority: string;
   tags: string[];
+  publishedAt: isoDateTime | null;
   createdAt: isoDateTime;
   updatedAt: isoDateTime;
 };

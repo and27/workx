@@ -1,5 +1,9 @@
 import { job } from "@/src/domain/entities/job";
-import { jobRepository, listJobsQuery } from "@/src/ports/job-repository";
+import {
+  jobRepository,
+  jobUpsertRecord,
+  listJobsQuery,
+} from "@/src/ports/job-repository";
 import { memoryStore } from "@/src/adapters/memory/store";
 
 const matchesSearch = (jobRecord: job, search: string) => {
@@ -12,6 +16,62 @@ const matchesSearch = (jobRecord: job, search: string) => {
 
 const matchesTags = (jobRecord: job, tags: string[]) =>
   tags.every((tag) => jobRecord.tags.includes(tag));
+
+const toHex = (value: number, length: number) =>
+  value.toString(16).padStart(length, "0");
+
+const makeId = (seed: number) =>
+  `${toHex(seed, 8)}-${toHex(seed, 4)}-${toHex(seed, 4)}-${toHex(
+    seed,
+    4
+  )}-${toHex(seed, 12)}`;
+
+let idCounter = 0;
+const createId = () => {
+  idCounter += 1;
+  return makeId(Math.abs(Date.now() + idCounter));
+};
+
+const applyUpsert = (
+  store: memoryStore,
+  record: jobUpsertRecord,
+  now: string
+) => {
+  const existing = store.jobs.find(
+    (jobRecord) =>
+      jobRecord.source === record.source &&
+      jobRecord.externalId === record.externalId
+  );
+
+  if (existing) {
+    existing.company = record.company;
+    existing.role = record.role;
+    existing.location = record.location;
+    existing.seniority = record.seniority;
+    existing.tags = record.tags;
+    existing.sourceUrl = record.sourceUrl;
+    existing.publishedAt = record.publishedAt;
+    existing.updatedAt = now;
+    return { created: false };
+  }
+
+  store.jobs.push({
+    id: createId(),
+    company: record.company,
+    role: record.role,
+    source: record.source,
+    sourceUrl: record.sourceUrl,
+    externalId: record.externalId,
+    location: record.location,
+    seniority: record.seniority,
+    tags: record.tags,
+    publishedAt: record.publishedAt,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  return { created: true };
+};
 
 export const createMemoryJobRepository = (
   store: memoryStore
@@ -37,5 +97,12 @@ export const createMemoryJobRepository = (
   },
   async getById(query: { id: string }) {
     return store.jobs.find((record) => record.id === query.id) ?? null;
+  },
+  async upsertByExternalId(input: { jobs: jobUpsertRecord[]; now: string }) {
+    const results = input.jobs.map((record) =>
+      applyUpsert(store, record, input.now)
+    );
+    const created = results.filter((result) => result.created).length;
+    return { created, updated: input.jobs.length - created };
   },
 });

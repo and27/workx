@@ -82,9 +82,12 @@ const seedJobsBase = (data: {
   company: string;
   role: string;
   source: string;
+  sourceUrl?: string | null;
+  externalId?: string | null;
   location: string;
   seniority: string;
   tags: string[];
+  publishedAt?: isoDateTime | null;
   createdOffsetDays: number;
   updatedOffsetDays: number;
 }): job => ({
@@ -92,9 +95,12 @@ const seedJobsBase = (data: {
   company: data.company,
   role: data.role,
   source: data.source,
+  sourceUrl: data.sourceUrl ?? null,
+  externalId: data.externalId ?? null,
   location: data.location,
   seniority: data.seniority,
   tags: data.tags,
+  publishedAt: data.publishedAt ?? null,
   createdAt: toIso(addDays(seedToday, data.createdOffsetDays)),
   updatedAt: toIso(addDays(seedToday, data.updatedOffsetDays)),
 });
