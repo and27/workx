@@ -7,25 +7,43 @@ import {
   seedJobs,
 } from "@/src/adapters/memory/seed";
 import { memoryStore } from "@/src/adapters/memory/store";
+import { createSupabaseApplicationLogRepository } from "@/src/adapters/supabase/application-log-repository";
+import { createSupabaseApplicationRepository } from "@/src/adapters/supabase/application-repository";
+import { createSupabaseJobRepository } from "@/src/adapters/supabase/job-repository";
 
 type globalStore = {
   __workxMemoryStore?: memoryStore;
 };
 
-const store =
-  (globalThis as globalStore).__workxMemoryStore ??
-  ({
-    applications: [...seedApplications],
-    applicationLogs: [...seedApplicationLogs],
-    jobs: [...seedJobs],
-  } satisfies memoryStore);
+const hasSupabaseConfig = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+);
 
-if (!(globalThis as globalStore).__workxMemoryStore) {
-  (globalThis as globalStore).__workxMemoryStore = store;
-}
+const createMemoryRepositories = () => {
+  const store =
+    (globalThis as globalStore).__workxMemoryStore ??
+    ({
+      applications: [...seedApplications],
+      applicationLogs: [...seedApplicationLogs],
+      jobs: [...seedJobs],
+    } satisfies memoryStore);
 
-export const repositories = {
-  applicationRepository: createMemoryApplicationRepository(store),
-  applicationLogRepository: createMemoryApplicationLogRepository(store),
-  jobRepository: createMemoryJobRepository(store),
+  if (!(globalThis as globalStore).__workxMemoryStore) {
+    (globalThis as globalStore).__workxMemoryStore = store;
+  }
+
+  return {
+    applicationRepository: createMemoryApplicationRepository(store),
+    applicationLogRepository: createMemoryApplicationLogRepository(store),
+    jobRepository: createMemoryJobRepository(store),
+  };
 };
+
+export const repositories = hasSupabaseConfig
+  ? {
+      applicationRepository: createSupabaseApplicationRepository(),
+      applicationLogRepository: createSupabaseApplicationLogRepository(),
+      jobRepository: createSupabaseJobRepository(),
+    }
+  : createMemoryRepositories();

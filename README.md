@@ -1,8 +1,8 @@
 # Workx
 
-Workx is a Phase 0, UI-first job application tracker. It uses a clean
-Ports & Adapters architecture with a memory adapter today and a future
-database adapter tomorrow.
+Workx is a job application tracker built with a clean Ports & Adapters
+architecture. It runs with the memory adapter by default and can use
+Supabase for persistence when env vars are present.
 
 ## Architecture (Ports & Adapters)
 
@@ -17,6 +17,18 @@ database adapter tomorrow.
 
 ```bash
 npm install
+```
+
+Create a `.env.local` with Supabase values to enable the Supabase adapter:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_key
+```
+
+Apply the schema in `supabase/schema.sql` to your Supabase project.
+
+```bash
 npm run dev
 ```
 
