@@ -50,7 +50,7 @@ export default async function ApplicationsPage({
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Postulaciones</h1>
         <p className="text-sm text-muted-foreground">
-          Gestiona el estado y prioridades de tu pipeline.
+          Gestiona el estado y las prioridades de tu pipeline.
         </p>
       </header>
 

@@ -38,16 +38,16 @@ const InboxSection = ({
           <div key={item.id} className="flex flex-wrap items-center gap-4 p-3">
             <div className="min-w-[220px] flex-1">
               <p className="text-sm font-medium">
-                {item.company} · {item.role}
+                {item.company} - {item.role}
               </p>
               <p className="text-xs text-muted-foreground">
-                Accion: {item.nextActionAt ?? "—"}
+                Siguiente accion: {item.nextActionAt ?? "-"}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline">{item.status}</Badge>
               <span className="text-xs text-muted-foreground">
-                {item.nextActionAt ?? "—"}
+                {item.nextActionAt ?? "-"}
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">

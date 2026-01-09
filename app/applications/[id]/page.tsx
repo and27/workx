@@ -93,7 +93,7 @@ export default async function ApplicationDetailPage({
     <div className="space-y-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">
-          {application.company} · {application.role}
+          {application.company} - {application.role}
         </h1>
         <p className="text-sm text-muted-foreground">
           Seguimiento y decisiones de la postulacion.
@@ -179,7 +179,7 @@ export default async function ApplicationDetailPage({
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Timeline</h2>
+          <h2 className="text-lg font-semibold">Historial</h2>
           <Badge variant="outline">{logs.length} eventos</Badge>
         </div>
         <div className="rounded-lg border border-border bg-card">

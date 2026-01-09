@@ -42,7 +42,7 @@ export default async function Home() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-semibold">Inicio</h1>
         <p className="text-sm text-muted-foreground">
           Descubre, prioriza y da seguimiento a tus postulaciones.
         </p>
@@ -69,7 +69,9 @@ export default async function Home() {
         </Card>
         <Card className="py-4">
           <CardContent className="space-y-1">
-            <p className="text-xs text-muted-foreground">Postulaciones semana</p>
+            <p className="text-xs text-muted-foreground">
+              Postulaciones esta semana
+            </p>
             <p className="text-2xl font-semibold">{thisWeek}</p>
           </CardContent>
         </Card>
@@ -77,8 +79,10 @@ export default async function Home() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Top matches hoy</h2>
-          <span className="text-xs text-muted-foreground">Basado en recientes</span>
+          <h2 className="text-lg font-semibold">Mejores coincidencias hoy</h2>
+          <span className="text-xs text-muted-foreground">
+            Basado en actividad reciente
+          </span>
         </div>
         <div className="overflow-hidden rounded-lg border border-border">
           <Table>

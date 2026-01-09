@@ -52,7 +52,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     "use server";
     const jobId = formData.get("jobId");
     if (typeof jobId !== "string" || jobId.length === 0) {
-      throw new Error("Job id requerido.");
+      throw new Error("ID de trabajo requerido.");
     }
     const result = await createApplicationFromJob({ jobId });
     if (!result.ok) {
@@ -106,7 +106,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
             </div>
             <div className="min-w-[160px]">
               <label className="text-xs text-muted-foreground" htmlFor="seniority">
-                Seniority
+                Senioridad
               </label>
               <Select name="seniority" defaultValue={rawSeniority ?? "all"}>
                 <SelectTrigger id="seniority" className="mt-1 w-full">
@@ -140,7 +140,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
               <TableHead>Empresa</TableHead>
               <TableHead>Fuente</TableHead>
               <TableHead>Ubicacion</TableHead>
-              <TableHead>Seniority</TableHead>
+              <TableHead>Senioridad</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead>Accion</TableHead>
             </TableRow>
