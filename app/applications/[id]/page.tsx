@@ -17,6 +17,7 @@ import {
   listApplicationLogs,
   updateApplication,
 } from "@/src/composition/usecases";
+import { formatDateTime } from "@/src/lib/format";
 
 const statusOptions = [
   "saved",
@@ -190,7 +191,7 @@ export default async function ApplicationDetailPage({
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">{entry.message}</p>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(entry.createdAt).toLocaleString("es-MX")}
+                    {formatDateTime(entry.createdAt)}
                   </span>
                 </div>
                 <Separator />

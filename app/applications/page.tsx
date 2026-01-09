@@ -20,6 +20,7 @@ import {
 import { listApplications } from "@/src/composition/usecases";
 import { applicationStatus } from "@/src/domain/types/application-status";
 import { priority } from "@/src/domain/types/priority";
+import { formatDate } from "@/src/lib/format";
 
 type applicationsPageProps = {
   searchParams?: Promise<{
@@ -164,7 +165,7 @@ export default async function ApplicationsPage({
                   {item.source}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {new Date(item.updatedAt).toLocaleDateString("es-MX")}
+                  {formatDate(item.updatedAt)}
                 </TableCell>
               </TableRow>
             ))}

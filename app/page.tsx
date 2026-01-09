@@ -14,6 +14,7 @@ import {
   listInbox,
   listJobs,
 } from "@/src/composition/usecases";
+import { formatDate } from "@/src/lib/format";
 
 export default async function Home() {
   const { overdue } = await listInbox();
@@ -137,7 +138,7 @@ export default async function Home() {
               <li key={entry.id} className="px-4 py-3">
                 <p className="text-sm">{entry.message}</p>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(entry.createdAt).toLocaleDateString("es-MX")}
+                  {formatDate(entry.createdAt)}
                 </p>
               </li>
             ))}
