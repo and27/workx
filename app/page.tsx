@@ -8,12 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { listInbox } from "@/src/composition/usecases";
-import { repositories } from "@/src/composition/repositories";
+import {
+  listApplicationLogs,
+  listApplications,
+  listInbox,
+  listJobs,
+} from "@/src/composition/usecases";
 
 export default async function Home() {
   const { overdue } = await listInbox();
-  const applications = await repositories.applicationRepository.list({});
+  const applications = await listApplications();
   const totalApplications = applications.length;
   const activeInterviews = applications.filter(
     (item) => item.status === "screen" || item.status === "tech"
@@ -31,12 +35,10 @@ export default async function Home() {
     return diffDays <= 7;
   }).length;
 
-  const jobs = await repositories.jobRepository.list({});
+  const jobs = await listJobs();
   const recentLogs =
     applications.length > 0
-      ? await repositories.applicationLogRepository.listByApplicationId({
-          applicationId: applications[0].id,
-        })
+      ? await listApplicationLogs({ applicationId: applications[0].id })
       : [];
 
   return (
