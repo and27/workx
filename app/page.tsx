@@ -1,9 +1,15 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { listInbox } from "@/src/composition/usecases";
 import { repositories } from "@/src/composition/repositories";
-import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
-
-const listInbox = createListInboxUseCase({
-  applicationRepository: repositories.applicationRepository,
-});
 
 export default async function Home() {
   const { overdue } = await listInbox();
@@ -43,22 +49,30 @@ export default async function Home() {
       </header>
 
       <section className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Total postulaciones</p>
-          <p className="text-2xl font-semibold">{totalApplications}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Entrevistas activas</p>
-          <p className="text-2xl font-semibold">{activeInterviews}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Acciones vencidas</p>
-          <p className="text-2xl font-semibold">{overdueCount}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Postulaciones semana</p>
-          <p className="text-2xl font-semibold">{thisWeek}</p>
-        </div>
+        <Card className="py-4">
+          <CardContent className="space-y-1">
+            <p className="text-xs text-muted-foreground">Total postulaciones</p>
+            <p className="text-2xl font-semibold">{totalApplications}</p>
+          </CardContent>
+        </Card>
+        <Card className="py-4">
+          <CardContent className="space-y-1">
+            <p className="text-xs text-muted-foreground">Entrevistas activas</p>
+            <p className="text-2xl font-semibold">{activeInterviews}</p>
+          </CardContent>
+        </Card>
+        <Card className="py-4">
+          <CardContent className="space-y-1">
+            <p className="text-xs text-muted-foreground">Acciones vencidas</p>
+            <p className="text-2xl font-semibold">{overdueCount}</p>
+          </CardContent>
+        </Card>
+        <Card className="py-4">
+          <CardContent className="space-y-1">
+            <p className="text-xs text-muted-foreground">Postulaciones semana</p>
+            <p className="text-2xl font-semibold">{thisWeek}</p>
+          </CardContent>
+        </Card>
       </section>
 
       <section className="space-y-3">
@@ -67,37 +81,42 @@ export default async function Home() {
           <span className="text-xs text-muted-foreground">Basado en recientes</span>
         </div>
         <div className="overflow-hidden rounded-lg border border-border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2">Rol</th>
-                <th className="px-3 py-2">Empresa</th>
-                <th className="px-3 py-2">Fuente</th>
-                <th className="px-3 py-2">Accion</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead>Rol</TableHead>
+                <TableHead>Empresa</TableHead>
+                <TableHead>Fuente</TableHead>
+                <TableHead>Accion</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {jobs.slice(0, 5).map((job) => (
-                <tr key={job.id} className="border-t border-border">
-                  <td className="px-3 py-2">{job.role}</td>
-                  <td className="px-3 py-2">{job.company}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{job.source}</td>
-                  <td className="px-3 py-2">
-                    <button className="rounded-md border border-border px-3 py-1 text-xs hover:bg-muted">
+                <TableRow key={job.id}>
+                  <TableCell>{job.role}</TableCell>
+                  <TableCell>{job.company}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {job.source}
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm">
                       Guardar
-                    </button>
-                  </td>
-                </tr>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
               {jobs.length === 0 && (
-                <tr>
-                  <td className="px-3 py-4 text-sm text-muted-foreground" colSpan={4}>
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="py-4 text-sm text-muted-foreground"
+                  >
                     Sin trabajos para mostrar.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </section>
 
