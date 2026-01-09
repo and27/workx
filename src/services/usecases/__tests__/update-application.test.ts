@@ -80,4 +80,51 @@ describe("updateApplication", () => {
       ["next_action_cleared", "notes_updated", "status_changed"].sort()
     );
   });
+
+  it("rejects invalid date-only values", async () => {
+    const applications: application[] = [makeApplication({})];
+    const logs: applicationLogEntry[] = [];
+
+    const applicationRepo: applicationRepository = {
+      async list() {
+        return applications;
+      },
+      async getById(query) {
+        return applications.find((item) => item.id === query.id) ?? null;
+      },
+      async create() {
+        throw new Error("Not implemented");
+      },
+      async update(query: { id: string; patch: applicationUpdatePatch }) {
+        const index = applications.findIndex((item) => item.id === query.id);
+        if (index < 0) {
+          throw new Error("Not found");
+        }
+        const updated = { ...applications[index], ...query.patch };
+        applications[index] = updated;
+        return updated;
+      },
+    };
+
+    const logRepo: applicationLogRepository = {
+      async listByApplicationId() {
+        return logs;
+      },
+      async create(query) {
+        logs.push(query.entry);
+      },
+    };
+
+    const usecase = updateApplicationUseCase({
+      applicationRepository: applicationRepo,
+      applicationLogRepository: logRepo,
+    });
+
+    await expect(
+      usecase({
+        id: "app-1",
+        nextActionAt: "2024-1-01",
+      })
+    ).rejects.toThrow("Invalid date-only value");
+  });
 });
