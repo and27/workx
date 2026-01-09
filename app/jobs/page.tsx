@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createApplicationFromJob, listJobs } from "@/src/composition/usecases";
+import JobSaveForm from "@/app/jobs/JobSaveForm";
+import { saveJobAction } from "@/app/jobs/actions";
+import { listApplications, listJobs } from "@/src/composition/usecases";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -43,25 +44,17 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     seniority,
   });
   const allJobs = await listJobs();
+  const applications = await listApplications();
+  const savedJobIds = new Set(
+    applications
+      .map((application) => application.jobId)
+      .filter((jobId): jobId is string => Boolean(jobId))
+  );
 
   const sources = Array.from(new Set(allJobs.map((job) => job.source))).sort();
   const seniorities = Array.from(
     new Set(allJobs.map((job) => job.seniority))
   ).sort();
-
-  async function saveJob(formData: FormData) {
-    "use server";
-    const jobId = formData.get("jobId");
-    if (typeof jobId !== "string" || jobId.length === 0) {
-      throw new Error("ID de trabajo requerido.");
-    }
-    const result = await createApplicationFromJob({ jobId });
-    if (!result.ok) {
-      throw result.error;
-    }
-    revalidatePath("/jobs");
-    revalidatePath("/applications");
-  }
 
   return (
     <div className="space-y-6">
@@ -170,12 +163,11 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <form action={saveJob}>
-                    <input type="hidden" name="jobId" value={job.id} />
-                    <Button type="submit" variant="outline" size="sm">
-                      Guardar como postulacion
-                    </Button>
-                  </form>
+                  <JobSaveForm
+                    jobId={job.id}
+                    saved={savedJobIds.has(job.id)}
+                    action={saveJobAction}
+                  />
                 </TableCell>
               </TableRow>
             ))}
