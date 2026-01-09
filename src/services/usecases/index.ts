@@ -1,5 +1,6 @@
 export type { inboxGroups } from "@/src/services/usecases/list-inbox";
 export type { listApplicationsInput } from "@/src/services/usecases/list-applications";
+export type { listJobsInput } from "@/src/services/usecases/list-jobs";
 export type {
   createApplicationFromJobInput,
   createApplicationFromJobDeps,
@@ -11,6 +12,7 @@ export type {
 export type { result, resultErr, resultOk } from "@/src/services/usecases/result";
 export { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 export { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
+export { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 export { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";
 export { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 export { ok, err } from "@/src/services/usecases/result";
