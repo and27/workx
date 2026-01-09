@@ -22,19 +22,20 @@ import { applicationStatus } from "@/src/domain/types/application-status";
 import { priority } from "@/src/domain/types/priority";
 
 type applicationsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string;
     status?: applicationStatus | "all";
     priority?: priority | "all";
-  };
+  }>;
 };
 
 export default async function ApplicationsPage({
   searchParams,
 }: applicationsPageProps) {
-  const search = searchParams?.q?.trim() ?? "";
-  const rawStatus = searchParams?.status;
-  const rawPriority = searchParams?.priority;
+  const params = (await searchParams) ?? {};
+  const search = params.q?.trim() ?? "";
+  const rawStatus = params.status;
+  const rawPriority = params.priority;
   const status = rawStatus && rawStatus !== "all" ? rawStatus : undefined;
   const priority =
     rawPriority && rawPriority !== "all" ? rawPriority : undefined;

@@ -42,15 +42,16 @@ const isPriorityOption = (
   typeof value === "string" && priorityOptions.includes(value as priorityOption);
 
 type applicationDetailProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default async function ApplicationDetailPage({
   params,
 }: applicationDetailProps) {
-  const application = await getApplication({ id: params.id });
+  const routeParams = await params;
+  const application = await getApplication({ id: routeParams.id });
   if (!application) {
     notFound();
   }

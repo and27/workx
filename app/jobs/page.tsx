@@ -21,17 +21,18 @@ import {
 import { createApplicationFromJob, listJobs } from "@/src/composition/usecases";
 
 type jobsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string;
     source?: string;
     seniority?: string;
-  };
+  }>;
 };
 
 export default async function JobsPage({ searchParams }: jobsPageProps) {
-  const search = searchParams?.q?.trim() ?? "";
-  const rawSource = searchParams?.source;
-  const rawSeniority = searchParams?.seniority;
+  const params = (await searchParams) ?? {};
+  const search = params.q?.trim() ?? "";
+  const rawSource = params.source;
+  const rawSeniority = params.seniority;
   const source = rawSource && rawSource !== "all" ? rawSource : undefined;
   const seniority =
     rawSeniority && rawSeniority !== "all" ? rawSeniority : undefined;

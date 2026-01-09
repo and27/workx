@@ -8,11 +8,21 @@ import {
 } from "@/src/adapters/memory/seed";
 import { memoryStore } from "@/src/adapters/memory/store";
 
-const store: memoryStore = {
-  applications: [...seedApplications],
-  applicationLogs: [...seedApplicationLogs],
-  jobs: [...seedJobs],
+type globalStore = {
+  __workxMemoryStore?: memoryStore;
 };
+
+const store =
+  (globalThis as globalStore).__workxMemoryStore ??
+  ({
+    applications: [...seedApplications],
+    applicationLogs: [...seedApplicationLogs],
+    jobs: [...seedJobs],
+  } satisfies memoryStore);
+
+if (!(globalThis as globalStore).__workxMemoryStore) {
+  (globalThis as globalStore).__workxMemoryStore = store;
+}
 
 export const repositories = {
   applicationRepository: createMemoryApplicationRepository(store),
