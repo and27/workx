@@ -6,6 +6,7 @@ import { createListApplicationsUseCase } from "@/src/services/usecases/list-appl
 import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
+import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 
 export const listApplications = createListApplicationsUseCase({
   applicationRepository: repositories.applicationRepository,
@@ -17,6 +18,10 @@ export const listInbox = createListInboxUseCase({
 
 export const listJobs = createListJobsUseCase({
   jobRepository: repositories.jobRepository,
+});
+
+export const ingestJobs = createIngestJobsUseCase({
+  jobSource: repositories.jobSource,
 });
 
 export const createApplicationFromJob = createApplicationFromJobUseCase({

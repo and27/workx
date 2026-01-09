@@ -7,6 +7,7 @@ import {
   seedJobs,
 } from "@/src/adapters/memory/seed";
 import { memoryStore } from "@/src/adapters/memory/store";
+import { createRemotiveJobSource } from "@/src/adapters/remotive/job-source";
 import { createSupabaseApplicationLogRepository } from "@/src/adapters/supabase/application-log-repository";
 import { createSupabaseApplicationRepository } from "@/src/adapters/supabase/application-repository";
 import { createSupabaseJobRepository } from "@/src/adapters/supabase/job-repository";
@@ -37,6 +38,7 @@ const createMemoryRepositories = () => {
     applicationRepository: createMemoryApplicationRepository(store),
     applicationLogRepository: createMemoryApplicationLogRepository(store),
     jobRepository: createMemoryJobRepository(store),
+    jobSource: createRemotiveJobSource(),
   };
 };
 
@@ -45,5 +47,6 @@ export const repositories = hasSupabaseConfig
       applicationRepository: createSupabaseApplicationRepository(),
       applicationLogRepository: createSupabaseApplicationLogRepository(),
       jobRepository: createSupabaseJobRepository(),
+      jobSource: createRemotiveJobSource(),
     }
   : createMemoryRepositories();

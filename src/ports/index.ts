@@ -8,3 +8,8 @@ export type {
   listApplicationLogsQuery,
 } from "@/src/ports/application-log-repository";
 export type { jobRepository, listJobsQuery } from "@/src/ports/job-repository";
+export type {
+  jobSource,
+  jobSourceQuery,
+  jobSourceRecord,
+} from "@/src/ports/job-source";
