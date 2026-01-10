@@ -1,4 +1,4 @@
-import { repositories } from "@/src/composition/repositories";
+import { getRepositories } from "@/src/composition/repositories";
 import { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";
 import { createGetApplicationUseCase } from "@/src/services/usecases/get-application";
 import { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
@@ -8,38 +8,44 @@ import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 
-export const listApplications = createListApplicationsUseCase({
-  applicationRepository: repositories.applicationRepository,
-});
+let _usecases: Awaited<ReturnType<typeof buildUseCases>> | null = null;
 
-export const listInbox = createListInboxUseCase({
-  applicationRepository: repositories.applicationRepository,
-});
+async function buildUseCases() {
+  const repositories = await getRepositories();
 
-export const listJobs = createListJobsUseCase({
-  jobRepository: repositories.jobRepository,
-});
+  return {
+    listApplications: createListApplicationsUseCase({
+      applicationRepository: repositories.applicationRepository,
+    }),
+    listInbox: createListInboxUseCase({
+      applicationRepository: repositories.applicationRepository,
+    }),
+    listJobs: createListJobsUseCase({
+      jobRepository: repositories.jobRepository,
+    }),
+    ingestJobs: createIngestJobsUseCase({
+      jobSource: repositories.jobSource,
+      jobRepository: repositories.jobRepository,
+    }),
+    createApplicationFromJob: createApplicationFromJobUseCase({
+      applicationRepository: repositories.applicationRepository,
+      applicationLogRepository: repositories.applicationLogRepository,
+      jobRepository: repositories.jobRepository,
+    }),
+    updateApplication: updateApplicationUseCase({
+      applicationRepository: repositories.applicationRepository,
+      applicationLogRepository: repositories.applicationLogRepository,
+    }),
+    getApplication: createGetApplicationUseCase({
+      applicationRepository: repositories.applicationRepository,
+    }),
+    listApplicationLogs: createListApplicationLogsUseCase({
+      applicationLogRepository: repositories.applicationLogRepository,
+    }),
+  };
+}
 
-export const ingestJobs = createIngestJobsUseCase({
-  jobSource: repositories.jobSource,
-  jobRepository: repositories.jobRepository,
-});
-
-export const createApplicationFromJob = createApplicationFromJobUseCase({
-  applicationRepository: repositories.applicationRepository,
-  applicationLogRepository: repositories.applicationLogRepository,
-  jobRepository: repositories.jobRepository,
-});
-
-export const updateApplication = updateApplicationUseCase({
-  applicationRepository: repositories.applicationRepository,
-  applicationLogRepository: repositories.applicationLogRepository,
-});
-
-export const getApplication = createGetApplicationUseCase({
-  applicationRepository: repositories.applicationRepository,
-});
-
-export const listApplicationLogs = createListApplicationLogsUseCase({
-  applicationLogRepository: repositories.applicationLogRepository,
-});
+export async function getUseCases() {
+  if (!_usecases) _usecases = await buildUseCases();
+  return _usecases;
+}

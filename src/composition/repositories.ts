@@ -8,13 +8,8 @@ import {
 } from "@/src/adapters/memory/seed";
 import { memoryStore } from "@/src/adapters/memory/store";
 import { createRemotiveJobSource } from "@/src/adapters/remotive/job-source";
-import { createSupabaseApplicationLogRepository } from "@/src/adapters/supabase/application-log-repository";
-import { createSupabaseApplicationRepository } from "@/src/adapters/supabase/application-repository";
-import { createSupabaseJobRepository } from "@/src/adapters/supabase/job-repository";
 
-type globalStore = {
-  __workxMemoryStore?: memoryStore;
-};
+type globalStore = { __workxMemoryStore?: memoryStore };
 
 const hasSupabaseConfig = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -42,11 +37,23 @@ const createMemoryRepositories = () => {
   };
 };
 
-export const repositories = hasSupabaseConfig
-  ? {
-      applicationRepository: createSupabaseApplicationRepository(),
-      applicationLogRepository: createSupabaseApplicationLogRepository(),
-      jobRepository: createSupabaseJobRepository(),
-      jobSource: createRemotiveJobSource(),
-    }
-  : createMemoryRepositories();
+export async function getRepositories() {
+  if (!hasSupabaseConfig) return createMemoryRepositories();
+
+  const { createSupabaseApplicationRepository } = await import(
+    "@/src/adapters/supabase/application-repository"
+  );
+  const { createSupabaseApplicationLogRepository } = await import(
+    "@/src/adapters/supabase/application-log-repository"
+  );
+  const { createSupabaseJobRepository } = await import(
+    "@/src/adapters/supabase/job-repository"
+  );
+
+  return {
+    applicationRepository: createSupabaseApplicationRepository(),
+    applicationLogRepository: createSupabaseApplicationLogRepository(),
+    jobRepository: createSupabaseJobRepository(),
+    jobSource: createRemotiveJobSource(),
+  };
+}

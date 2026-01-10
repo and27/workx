@@ -17,10 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { listApplications } from "@/src/composition/usecases";
 import { applicationStatus } from "@/src/domain/types/application-status";
 import { priority } from "@/src/domain/types/priority";
 import { formatDate } from "@/src/lib/format";
+import { getUseCases } from "@/src/composition/usecases";
 
 type applicationsPageProps = {
   searchParams?: Promise<{
@@ -33,6 +33,7 @@ type applicationsPageProps = {
 export default async function ApplicationsPage({
   searchParams,
 }: applicationsPageProps) {
+  const { listApplications } = await getUseCases();
   const params = (await searchParams) ?? {};
   const search = params.q?.trim() ?? "";
   const rawStatus = params.status;

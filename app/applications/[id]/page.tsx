@@ -12,12 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getApplication,
-  listApplicationLogs,
-  updateApplication,
-} from "@/src/composition/usecases";
 import { formatDateTime } from "@/src/lib/format";
+import { getUseCases } from "@/src/composition/usecases";
 
 const statusOptions = [
   "saved",
@@ -34,13 +30,16 @@ const priorityOptions = ["low", "medium", "high"] as const;
 type statusOption = (typeof statusOptions)[number];
 type priorityOption = (typeof priorityOptions)[number];
 
-const isStatusOption = (value: FormDataEntryValue | null): value is statusOption =>
+const isStatusOption = (
+  value: FormDataEntryValue | null
+): value is statusOption =>
   typeof value === "string" && statusOptions.includes(value as statusOption);
 
 const isPriorityOption = (
   value: FormDataEntryValue | null
 ): value is priorityOption =>
-  typeof value === "string" && priorityOptions.includes(value as priorityOption);
+  typeof value === "string" &&
+  priorityOptions.includes(value as priorityOption);
 
 type applicationDetailProps = {
   params: Promise<{
@@ -51,6 +50,8 @@ type applicationDetailProps = {
 export default async function ApplicationDetailPage({
   params,
 }: applicationDetailProps) {
+  const { listApplicationLogs, updateApplication, getApplication } =
+    await getUseCases();
   const routeParams = await params;
   const application = await getApplication({ id: routeParams.id });
   if (!application) {

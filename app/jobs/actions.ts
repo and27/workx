@@ -1,7 +1,7 @@
 "use server";
 
+import { getUseCases } from "@/src/composition/usecases";
 import { revalidatePath } from "next/cache";
-import { createApplicationFromJob } from "@/src/composition/usecases";
 
 export type saveJobState = {
   ok: boolean;
@@ -12,6 +12,7 @@ export async function saveJobAction(
   _prevState: saveJobState | null,
   formData: FormData
 ): Promise<saveJobState> {
+  const { createApplicationFromJob } = await getUseCases();
   const jobId = formData.get("jobId");
   if (typeof jobId !== "string" || jobId.length === 0) {
     return { ok: false, message: "ID de trabajo requerido." };

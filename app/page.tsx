@@ -8,15 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  listApplicationLogs,
-  listApplications,
-  listInbox,
-  listJobs,
-} from "@/src/composition/usecases";
+import { getUseCases } from "@/src/composition/usecases";
+
 import { formatDate } from "@/src/lib/format";
 
 export default async function Home() {
+  const { listInbox, listApplications, listJobs, listApplicationLogs } =
+    await getUseCases();
   const { overdue } = await listInbox();
   const applications = await listApplications();
   const totalApplications = applications.length;

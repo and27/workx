@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import JobSaveForm from "@/app/jobs/JobSaveForm";
 import { saveJobAction } from "@/app/jobs/actions";
-import { listApplications, listJobs } from "@/src/composition/usecases";
+import { getUseCases } from "@/src/composition/usecases";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -30,6 +30,7 @@ type jobsPageProps = {
 };
 
 export default async function JobsPage({ searchParams }: jobsPageProps) {
+  const { listApplications, listJobs } = await getUseCases();
   const params = (await searchParams) ?? {};
   const search = params.q?.trim() ?? "";
   const rawSource = params.source;
@@ -99,7 +100,10 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
               </Select>
             </div>
             <div className="min-w-[160px]">
-              <label className="text-xs text-muted-foreground" htmlFor="seniority">
+              <label
+                className="text-xs text-muted-foreground"
+                htmlFor="seniority"
+              >
                 Senioridad
               </label>
               <Select name="seniority" defaultValue={rawSeniority ?? "all"}>

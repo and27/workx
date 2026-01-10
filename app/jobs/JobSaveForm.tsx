@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import type { saveJobState } from "@/app/jobs/actions";
@@ -27,14 +27,18 @@ const SubmitButton = ({ saved }: submitButtonProps) => {
       {pending
         ? "Guardando..."
         : saved
-          ? "Postulacion guardada"
-          : "Guardar como postulacion"}
+        ? "Postulacion guardada"
+        : "Guardar como postulacion"}
     </Button>
   );
 };
 
-export default function JobSaveForm({ jobId, saved, action }: jobSaveFormProps) {
-  const [state, formAction] = useFormState(action, null);
+export default function JobSaveForm({
+  jobId,
+  saved,
+  action,
+}: jobSaveFormProps) {
+  const [state, formAction] = useActionState(action, null);
   const hasMounted = useRef(false);
   const [isSaved, setIsSaved] = useState(saved);
   const { toast } = useToast();
