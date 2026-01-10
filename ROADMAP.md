@@ -1,6 +1,6 @@
 # ROADMAP — Workx
 
-## Phase 0 — UI-first (Portfolio Core)
+## Phase 0 - UI-first (Portfolio Core) [DONE]
 
 **Goal:** Build a portfolio-grade product experience without backend infra.
 
@@ -30,7 +30,7 @@ Exit criteria:
 
 ---
 
-## Phase 1 — Persistence & Auth (Day 3)
+## Phase 1 - Persistence & Auth (Day 3) [DONE]
 
 **Goal:** Replace memory adapter with real persistence.
 
@@ -56,13 +56,14 @@ Exit criteria:
 
 ---
 
-## Phase 2 — Job Discovery & Ranking
+## Phase 2 - Job Discovery & Ranking [IN PROGRESS]
 
 **Goal:** Assist job discovery without auto-applying.
 
 Scope:
 
-- Daily scraper (1–2 sources).
+- Manual ingestion (1-2 sources).
+- Daily scraper (1-2 sources).
 - Job ranking/scoring (stack match, seniority).
 - “Top matches today” in Dashboard.
 - Deduplication and snapshots.
