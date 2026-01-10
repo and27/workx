@@ -1,10 +1,10 @@
-import { revalidatePath } from "next/cache";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { listInbox, updateApplication } from "@/src/composition/usecases";
 import { dateOnly } from "@/src/domain/types/date-only";
+import { getUseCases } from "@/src/composition/usecases";
+import { markDoneAction, rescheduleAction } from "@/app/inbox/actions";
 
 type inboxSectionProps = {
   title: string;
@@ -83,45 +83,8 @@ const InboxSection = ({
 );
 
 export default async function InboxPage() {
+  const { listInbox } = await getUseCases();
   const { overdue, today, upcoming } = await listInbox();
-
-  async function markDone(formData: FormData) {
-    "use server";
-    const id = formData.get("applicationId");
-    if (typeof id !== "string" || id.length === 0) {
-      throw new Error("applicationId requerido.");
-    }
-    const result = await updateApplication({
-      id,
-      nextActionAt: null,
-    });
-    if (!result.ok) {
-      throw result.error;
-    }
-    revalidatePath("/inbox");
-    revalidatePath("/applications");
-  }
-
-  async function reschedule(formData: FormData) {
-    "use server";
-    const id = formData.get("applicationId");
-    const nextActionAt = formData.get("nextActionAt");
-    if (typeof id !== "string" || id.length === 0) {
-      throw new Error("applicationId requerido.");
-    }
-    if (typeof nextActionAt !== "string" || nextActionAt.length === 0) {
-      throw new Error("nextActionAt requerido.");
-    }
-    const result = await updateApplication({
-      id,
-      nextActionAt,
-    });
-    if (!result.ok) {
-      throw result.error;
-    }
-    revalidatePath("/inbox");
-    revalidatePath("/applications");
-  }
 
   return (
     <div className="space-y-6">
@@ -137,22 +100,22 @@ export default async function InboxPage() {
           title="Vencidas"
           emptyLabel="No tienes acciones vencidas."
           items={overdue}
-          onMarkDone={markDone}
-          onReschedule={reschedule}
+          onMarkDone={markDoneAction}
+          onReschedule={rescheduleAction}
         />
         <InboxSection
           title="Hoy"
           emptyLabel="Sin acciones para hoy."
           items={today}
-          onMarkDone={markDone}
-          onReschedule={reschedule}
+          onMarkDone={markDoneAction}
+          onReschedule={rescheduleAction}
         />
         <InboxSection
           title="Proximas"
           emptyLabel="Sin acciones proximas."
           items={upcoming}
-          onMarkDone={markDone}
-          onReschedule={reschedule}
+          onMarkDone={markDoneAction}
+          onReschedule={rescheduleAction}
         />
       </div>
     </div>
