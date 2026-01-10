@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { supabase } from "@/src/adapters/supabase/client";
 import { job } from "@/src/domain/entities/job";
 import {
@@ -134,6 +135,7 @@ export const createSupabaseJobRepository = (): jobRepository => ({
 
     if (toInsert.length > 0) {
       const insertRows = toInsert.map((record) => ({
+        id: randomUUID(),
         ...toUpsertRow(record, input.now),
         created_at: input.now,
       }));
