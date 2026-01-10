@@ -8,6 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import JobSaveForm from "@/app/jobs/JobSaveForm";
+import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
 
 import { formatDate } from "@/src/lib/format";
@@ -35,6 +37,11 @@ export default async function Home() {
   }).length;
 
   const jobs = await listJobs();
+  const savedJobIds = new Set(
+    applications
+      .map((application) => application.jobId)
+      .filter((jobId): jobId is string => Boolean(jobId))
+  );
   const recentLogs =
     applications.length > 0
       ? await listApplicationLogs({ applicationId: applications[0].id })
@@ -104,9 +111,11 @@ export default async function Home() {
                     {job.source}
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">
-                      Guardar
-                    </Button>
+                    <JobSaveForm
+                      jobId={job.id}
+                      saved={savedJobIds.has(job.id)}
+                      action={saveJobAction}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
