@@ -136,21 +136,31 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
             <TableRow>
               <TableHead>Rol</TableHead>
               <TableHead>Empresa</TableHead>
-              <TableHead>Fuente</TableHead>
               <TableHead>Ubicacion</TableHead>
               <TableHead>Senioridad</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead>Accion</TableHead>
+              <TableHead>Fuente</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {jobs.map((job) => (
               <TableRow key={job.id}>
-                <TableCell>{job.role}</TableCell>
-                <TableCell>{job.company}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {job.source}
+                <TableCell>
+                  {job.sourceUrl ? (
+                    <a
+                      href={job.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-medium underline-offset-4 hover:underline"
+                    >
+                      {job.role}
+                    </a>
+                  ) : (
+                    job.role
+                  )}
                 </TableCell>
+                <TableCell>{job.company}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {job.location}
                 </TableCell>
@@ -158,7 +168,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
                   {job.seniority}
                 </TableCell>
                 <TableCell>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pr-1">
                     {job.tags.map((tag) => (
                       <Badge key={tag} variant="outline">
                         {tag}
@@ -172,6 +182,9 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
                     saved={savedJobIds.has(job.id)}
                     action={saveJobAction}
                   />
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {job.source}
                 </TableCell>
               </TableRow>
             ))}

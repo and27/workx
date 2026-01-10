@@ -17,6 +17,19 @@ type remotiveResponse = {
 };
 
 const SOURCE = "Remotive";
+const includeKeywords = ["frontend", "react", "ui", "ux", "product", "design"];
+const excludeKeywords = ["sales", "marketing", "recruiter", "account executive"];
+
+const toSearchText = (value: string) => value.toLowerCase();
+
+const shouldInclude = (record: jobSourceRecord) => {
+  const parts = [record.role, record.company, ...record.tags].map(toSearchText);
+  const haystack = parts.join(" ");
+  if (excludeKeywords.some((keyword) => haystack.includes(keyword))) {
+    return false;
+  }
+  return includeKeywords.some((keyword) => haystack.includes(keyword));
+};
 
 const normalizeSeniority = (title: string) => {
   const normalized = title.toLowerCase();
@@ -75,7 +88,7 @@ export const createRemotiveJobSource = (): jobSource => ({
     }
 
     const payload = (await response.json()) as remotiveResponse;
-    const records = payload.jobs.map(toSourceRecord);
+    const records = payload.jobs.map(toSourceRecord).filter(shouldInclude);
     const limited = query.limit ? records.slice(0, query.limit) : records;
     return limited;
   },
