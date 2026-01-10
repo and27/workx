@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,32 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/src/lib/format";
 import { getUseCases } from "@/src/composition/usecases";
-
-const statusOptions = [
-  "saved",
-  "applied",
-  "screen",
-  "tech",
-  "offer",
-  "rejected",
-  "ghosted",
-] as const;
-
-const priorityOptions = ["low", "medium", "high"] as const;
-
-type statusOption = (typeof statusOptions)[number];
-type priorityOption = (typeof priorityOptions)[number];
-
-const isStatusOption = (
-  value: FormDataEntryValue | null
-): value is statusOption =>
-  typeof value === "string" && statusOptions.includes(value as statusOption);
-
-const isPriorityOption = (
-  value: FormDataEntryValue | null
-): value is priorityOption =>
-  typeof value === "string" &&
-  priorityOptions.includes(value as priorityOption);
+import {
+  priorityOptions,
+  statusOptions,
+} from "@/app/applications/[id]/options";
+import { saveChangesAction } from "@/app/applications/[id]/actions";
 
 type applicationDetailProps = {
   params: Promise<{
@@ -50,8 +28,7 @@ type applicationDetailProps = {
 export default async function ApplicationDetailPage({
   params,
 }: applicationDetailProps) {
-  const { listApplicationLogs, updateApplication, getApplication } =
-    await getUseCases();
+  const { listApplicationLogs, getApplication } = await getUseCases();
   const routeParams = await params;
   const application = await getApplication({ id: routeParams.id });
   if (!application) {
@@ -59,38 +36,6 @@ export default async function ApplicationDetailPage({
   }
 
   const logs = await listApplicationLogs({ applicationId: application.id });
-
-  async function saveChanges(formData: FormData) {
-    "use server";
-    const id = formData.get("applicationId");
-    const status = formData.get("status");
-    const priority = formData.get("priority");
-    const nextActionAt = formData.get("nextActionAt");
-    const notes = formData.get("notes");
-
-    if (typeof id !== "string" || id.length === 0) {
-      throw new Error("applicationId requerido.");
-    }
-
-    const result = await updateApplication({
-      id,
-      status: isStatusOption(status) ? status : undefined,
-      priority: isPriorityOption(priority) ? priority : undefined,
-      nextActionAt:
-        typeof nextActionAt === "string" && nextActionAt.length > 0
-          ? nextActionAt
-          : null,
-      notes: typeof notes === "string" ? notes : undefined,
-    });
-
-    if (!result.ok) {
-      throw result.error;
-    }
-
-    revalidatePath(`/applications/${id}`);
-    revalidatePath("/applications");
-    revalidatePath("/inbox");
-  }
 
   return (
     <div className="space-y-6">
@@ -104,7 +49,7 @@ export default async function ApplicationDetailPage({
       </header>
 
       <section className="rounded-lg border border-border bg-card p-4">
-        <form className="space-y-4" action={saveChanges}>
+        <form className="space-y-4" action={saveChangesAction}>
           <input type="hidden" name="applicationId" value={application.id} />
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-1">

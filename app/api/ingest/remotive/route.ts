@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ingestJobs } from "@/src/composition/usecases";
+import { getUseCases } from "@/src/composition/usecases";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     Number.isFinite(limit) && limit && limit > 0 ? limit : undefined;
 
   try {
+    const { ingestJobs } = await getUseCases();
     const result = await ingestJobs({ source: "Remotive", limit: safeLimit });
     if (!result.ok) {
       return NextResponse.json(
@@ -17,9 +18,16 @@ export async function GET(request: Request) {
       );
     }
     return NextResponse.json({ ok: true, ...result.value });
-  } catch (_error) {
+  } catch (error) {
+    console.error("Remotive ingest failed", error);
     return NextResponse.json(
-      { ok: false, error: "No pudimos ingestar trabajos." },
+      {
+        ok: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "No pudimos ingestar trabajos.",
+      },
       { status: 500 }
     );
   }
