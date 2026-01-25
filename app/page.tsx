@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -69,12 +70,17 @@ export default async function Home() {
             <p className="text-2xl font-semibold">{activeInterviews}</p>
           </CardContent>
         </Card>
-        <Card className="py-4">
-          <CardContent className="space-y-1">
-            <p className="text-xs text-muted-foreground">Acciones vencidas</p>
-            <p className="text-2xl font-semibold">{overdueCount}</p>
-          </CardContent>
-        </Card>
+        <Link
+          href="/inbox?filter=overdue"
+          className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Card className="py-4">
+            <CardContent className="space-y-1">
+              <p className="text-xs text-muted-foreground">Acciones vencidas</p>
+              <p className="text-2xl font-semibold">{overdueCount}</p>
+            </CardContent>
+          </Card>
+        </Link>
         <Card className="py-4">
           <CardContent className="space-y-1">
             <p className="text-xs text-muted-foreground">
