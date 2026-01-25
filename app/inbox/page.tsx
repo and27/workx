@@ -4,7 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { dateOnly } from "@/src/domain/types/date-only";
 import { getUseCases } from "@/src/composition/usecases";
-import { markDoneAction, rescheduleAction } from "@/app/inbox/actions";
+import {
+  archiveAction,
+  markDoneAction,
+  rescheduleAction,
+} from "@/app/inbox/actions";
 
 type inboxSectionProps = {
   title: string;
@@ -18,6 +22,8 @@ type inboxSectionProps = {
   }[];
   onMarkDone: (formData: FormData) => Promise<void>;
   onReschedule: (formData: FormData) => Promise<void>;
+  onArchive?: (formData: FormData) => Promise<void>;
+  showArchive?: boolean;
 };
 
 const InboxSection = ({
@@ -26,6 +32,8 @@ const InboxSection = ({
   items,
   onMarkDone,
   onReschedule,
+  onArchive,
+  showArchive = false,
 }: inboxSectionProps) => (
   <Card>
     <CardContent className="space-y-3">
@@ -57,6 +65,14 @@ const InboxSection = ({
                   Marcar hecho
                 </Button>
               </form>
+              {showArchive && onArchive && (
+                <form action={onArchive}>
+                  <input type="hidden" name="applicationId" value={item.id} />
+                  <Button type="submit" variant="outline" size="sm">
+                    Archivar
+                  </Button>
+                </form>
+              )}
               <form action={onReschedule} className="flex items-center gap-2">
                 <input type="hidden" name="applicationId" value={item.id} />
                 <Input
@@ -105,13 +121,15 @@ export default async function InboxPage({ searchParams }: inboxPageProps) {
 
       <div className="grid gap-4">
         {filter === "overdue" ? (
-          <InboxSection
-            title="Vencidas"
-            emptyLabel="No tienes acciones vencidas."
-            items={overdue}
-            onMarkDone={markDoneAction}
-            onReschedule={rescheduleAction}
-          />
+        <InboxSection
+          title="Vencidas"
+          emptyLabel="No tienes acciones vencidas."
+          items={overdue}
+          onMarkDone={markDoneAction}
+          onReschedule={rescheduleAction}
+          onArchive={archiveAction}
+          showArchive
+        />
         ) : (
           <>
             <InboxSection

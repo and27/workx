@@ -16,6 +16,9 @@ export const createListInboxUseCase =
 
     return items.reduce<inboxGroups>(
       (groups, item) => {
+        if (item.status === "archived") {
+          return groups;
+        }
         if (!item.nextActionAt) {
           return groups;
         }

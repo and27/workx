@@ -7,6 +7,7 @@ import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
+import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
 
 let _usecases: Awaited<ReturnType<typeof buildUseCases>> | null = null;
 
@@ -33,6 +34,10 @@ async function buildUseCases() {
       jobRepository: repositories.jobRepository,
     }),
     updateApplication: updateApplicationUseCase({
+      applicationRepository: repositories.applicationRepository,
+      applicationLogRepository: repositories.applicationLogRepository,
+    }),
+    archiveApplication: createArchiveApplicationUseCase({
       applicationRepository: repositories.applicationRepository,
       applicationLogRepository: repositories.applicationLogRepository,
     }),

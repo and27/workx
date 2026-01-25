@@ -6,6 +6,7 @@ export const statusOptions = [
   "offer",
   "rejected",
   "ghosted",
+  "archived",
 ] as const;
 
 export const priorityOptions = ["low", "medium", "high"] as const;

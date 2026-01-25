@@ -5,4 +5,5 @@ export type applicationStatus =
   | "tech"
   | "offer"
   | "rejected"
-  | "ghosted";
+  | "ghosted"
+  | "archived";
