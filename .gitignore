@@ -42,3 +42,4 @@ next-env.d.ts
 
 
 supabase/.temp/*
+temporal_issues.md
