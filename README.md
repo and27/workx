@@ -1,15 +1,29 @@
 # Workx
 
-Workx is a job application tracker built with a clean Ports & Adapters
-architecture. It runs with the memory adapter by default and can use
-Supabase for persistence when env vars are present.
+Workx is a single-user job search execution system: it helps you decide what to do today and keeps a clean timeline of actions taken.
+
+It is built with a Ports & Adapters architecture. By default it runs in **memory mode** (seeded data). When Supabase env vars are present, it uses **Supabase persistence**.
+
+Job discovery foundations are implemented via a manual ingestion flow (Remotive source) and a jobs list with filters. Automated scraping and ranking are future phases (see `ROADMAP.md`).
+
+## Daily Decision Loop
+
+Workx is designed to be opened once per day.
+
+When you open it, it helps you decide:
+
+- Which applications require action today (especially overdue next actions).
+- Which new jobs are worth converting into applications.
+- What you can safely ignore.
+
+Every feature should reduce decision fatigue and increase execution speed.
 
 ## Architecture (Ports & Adapters)
 
 - Domain: `src/domain/**` (framework-agnostic types and entities)
 - Ports: `src/ports/**` (stable interfaces)
-- Adapters: `src/adapters/**` (Phase 0 uses memory)
-- Use cases: `src/services/usecases/**` (business rules and logs)
+- Adapters: `src/adapters/**` (memory + optional Supabase)
+- Use cases: `src/services/usecases/**` (business rules, writes, audit logs)
 - Composition: `src/composition/**` (wire adapters to ports)
 - UI: `app/**` (calls use cases only)
 
@@ -33,6 +47,16 @@ npm run dev
 ```
 
 Open http://localhost:3000
+
+## Manual Job Ingestion (Remotive)
+
+With the dev server running, you can trigger manual ingestion from Remotive:
+
+```bash
+curl "http://localhost:3000/api/ingest/remotive?limit=50"
+```
+
+This will upsert jobs by `externalId` and make them available in the Jobs page.
 
 ## Scripts
 

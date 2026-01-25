@@ -1,102 +1,128 @@
-# ROADMAP — Workx
+# ROADMAP – Workx
 
-## Phase 0 - UI-first (Portfolio Core) [DONE]
+## Phase 0 – Execution UI (Portfolio Core) ✅
 
-**Goal:** Build a portfolio-grade product experience without backend infra.
+**Goal:** Prove an execution-first user experience without backend dependency.
 
-Scope:
+**Delivers:**
 
-- Notion-style UI using shadcn/ui.
-- Domain models, ports, and memory adapters.
-- Dashboard (Home) with execution-focused metrics.
-- Applications table (primary working view).
-- Jobs table (discovery → convert to application).
-- Inbox view (Overdue / Today / Upcoming).
-- Application detail with timeline (audit log).
-- Selective TDD for use cases (no UI tests required).
+- Execution-focused dashboard (Home).
+- Inbox: Overdue / Today / Upcoming.
+- Applications as the primary working surface.
+- Jobs as discovery → convert to application.
+- Application timeline (audit log).
+- Clean Ports & Adapters architecture with memory adapter.
+- Selective TDD for use cases.
 
-Out of scope:
+**Non-goals:**
 
-- Supabase integration.
-- Authentication.
-- Scraping workers.
-- Auto-application to job portals.
+- Persistence, authentication, automation.
 
-Exit criteria:
+**Exit criteria:**
 
 - App runs locally with seeded data.
 - All business rules live in use cases.
-- UI never imports adapters directly.
+- UI depends only on use cases (never adapters).
 
 ---
 
-## Phase 1 - Persistence & Auth (Day 3) [DONE]
+## Phase 1 – Persistence (Supabase) ✅
 
-**Goal:** Replace memory adapter with real persistence.
+**Goal:** Persist execution data without changing the user experience.
 
-Scope:
+**Delivers:**
 
-- Supabase integration (DB + Storage).
 - Supabase adapter implementing existing ports.
-- Optional email/password auth.
-- Data migration from seed → DB.
-- Keep UI unchanged.
+- Database schema and migrations.
+- Optional email/password authentication.
+- Memory ↔ Supabase swap with no UI changes.
 
-Out of scope:
+**Non-goals:**
 
-- Advanced permissions.
-- Multi-tenant orgs.
-- Scraping automation.
+- Permissions, multi-tenant support, automation.
 
-Exit criteria:
+**Exit criteria:**
 
+- Data survives reloads.
 - Switching adapters does not require UI refactors.
-- Data persists across reloads.
 - Existing tests still pass.
 
 ---
 
-## Phase 2 - Job Discovery & Ranking [IN PROGRESS]
+## Phase 2 – Job Discovery (Manual Ingestion) ✅
 
-**Goal:** Assist job discovery without auto-applying.
+**Goal:** Feed the daily execution loop with real job opportunities.
 
-Scope:
+**Delivers:**
 
-- Manual ingestion (1-2 sources).
-- Daily scraper (1-2 sources).
-- Job ranking/scoring (stack match, seniority).
-- “Top matches today” in Dashboard.
-- Deduplication and snapshots.
+- Manual job ingestion (Remotive source).
+- API trigger for ingestion.
+- Jobs list with basic filters in UI.
+- “Top matches today” (flat list, no ranking).
+- Deduplication via `(source, externalId)` upsert.
 
-Out of scope:
+**Non-goals:**
 
-- LinkedIn auto-apply.
-- Large-scale scraping.
-- Proxy infrastructure.
+- Automated scraping, ranking, snapshots.
 
-Exit criteria:
+**Exit criteria:**
 
-- Scraper runs once daily.
-- Jobs appear in UI without manual input.
+- Jobs can be ingested manually and reviewed daily.
 
 ---
 
-## Phase 3 — Productivity Automation (Optional)
+## Phase 2.1 – Daily Decision UX (Closure)
 
-**Goal:** Reduce manual follow-up work.
+**Goal:** Make discovery and execution actionable without ambiguity.
 
 Scope:
 
-- Follow-up reminders.
-- Message templates (copy/open LinkedIn).
-- Calendar reminders.
-- Analytics (conversion by stage/source).
-
-Out of scope:
-
-- Full ATS replacement.
-- Enterprise integrations.
+- Overdue metrics link to actionable views.
+- Clear temporal context for job discovery (publishedAt).
+- Reduce “informational-only” UI elements.
 
 Exit criteria:
 
-- Clear productivity gain for a single user.
+- User can identify overdue actions in one click.
+- User understands job freshness at a glance.
+
+---
+
+## Phase 3 – Discovery Ranking (Light, Future)
+
+**Goal:** Reduce decision fatigue by prioritizing relevant jobs.
+
+**Delivers:**
+
+- Basic ranking heuristics (seniority, keywords, recency).
+- Ordered “Top matches today”.
+- Improved deduplication rules.
+
+**Non-goals:**
+
+- ML models, heavy scoring pipelines, mass scraping.
+
+**Exit criteria:**
+
+- Jobs appear pre-sorted by relevance with minimal configuration.
+
+---
+
+## Phase 4 – Productivity Automation (Optional)
+
+**Goal:** Reduce follow-up overhead for a single user.
+
+**Delivers:**
+
+- Follow-up reminders.
+- Message templates (copy/open LinkedIn or email).
+- Calendar nudges.
+- Lightweight analytics (conversion by stage/source).
+
+**Non-goals:**
+
+- Full ATS replacement, enterprise features.
+
+**Exit criteria:**
+
+- Measurable reduction in manual tracking and missed follow-ups.
