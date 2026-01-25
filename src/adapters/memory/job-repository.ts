@@ -49,6 +49,7 @@ const applyUpsert = (
     existing.location = record.location;
     existing.seniority = record.seniority;
     existing.tags = record.tags;
+    existing.description = record.description;
     existing.sourceUrl = record.sourceUrl;
     existing.publishedAt = record.publishedAt;
     existing.updatedAt = now;
@@ -65,6 +66,7 @@ const applyUpsert = (
     location: record.location,
     seniority: record.seniority,
     tags: record.tags,
+    description: record.description,
     publishedAt: record.publishedAt,
     createdAt: now,
     updatedAt: now,

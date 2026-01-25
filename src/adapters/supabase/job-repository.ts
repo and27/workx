@@ -17,6 +17,7 @@ type jobRow = {
   location: string;
   seniority: string;
   tags: string[];
+  description: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -32,6 +33,7 @@ const toJob = (row: jobRow): job => ({
   location: row.location,
   seniority: row.seniority,
   tags: row.tags ?? [],
+  description: row.description ?? null,
   publishedAt: row.published_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -46,6 +48,7 @@ const toUpsertRow = (record: jobUpsertRecord, now: string) => ({
   location: record.location,
   seniority: record.seniority,
   tags: record.tags,
+  description: record.description,
   published_at: record.publishedAt,
   updated_at: now,
 });

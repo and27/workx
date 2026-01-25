@@ -8,6 +8,7 @@ create table if not exists public.jobs (
   location text not null,
   seniority text not null,
   tags text[] not null default '{}'::text[],
+  description text null,
   published_at timestamptz null,
   created_at timestamptz not null,
   updated_at timestamptz not null

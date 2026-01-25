@@ -10,6 +10,7 @@ type remotiveJob = {
   tags: string[];
   candidate_required_location: string;
   publication_date: string;
+  description?: string;
 };
 
 type remotiveResponse = {
@@ -72,6 +73,7 @@ const toSourceRecord = (job: remotiveJob): jobSourceRecord => ({
     : [job.category, job.job_type].filter(
         (value): value is string => Boolean(value)
       ),
+  description: job.description ?? null,
   sourceUrl: job.url,
   publishedAt: toPublishedAt(job.publication_date),
 });
