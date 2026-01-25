@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,17 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import JobSaveForm from "@/app/jobs/JobSaveForm";
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
+import JobTable from "@/src/components/JobTable";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -46,11 +37,9 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
   });
   const allJobs = await listJobs();
   const applications = await listApplications();
-  const savedJobIds = new Set(
-    applications
-      .map((application) => application.jobId)
-      .filter((jobId): jobId is string => Boolean(jobId))
-  );
+  const savedJobIds = applications
+    .map((application) => application.jobId)
+    .filter((jobId): jobId is string => Boolean(jobId));
 
   const sources = Array.from(new Set(allJobs.map((job) => job.source))).sort();
   const seniorities = Array.from(
@@ -131,75 +120,12 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
           </form>
         </div>
 
-        <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead>Rol</TableHead>
-              <TableHead>Empresa</TableHead>
-              <TableHead>Ubicacion</TableHead>
-              <TableHead>Senioridad</TableHead>
-              <TableHead>Tags</TableHead>
-              <TableHead>Accion</TableHead>
-              <TableHead>Fuente</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {jobs.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell>
-                  {job.sourceUrl ? (
-                    <a
-                      href={job.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm font-medium underline-offset-4 hover:underline"
-                    >
-                      {job.role}
-                    </a>
-                  ) : (
-                    job.role
-                  )}
-                </TableCell>
-                <TableCell>{job.company}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {job.location}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {job.seniority}
-                </TableCell>
-                <TableCell>
-                  <div className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pr-1">
-                    {job.tags.map((tag) => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <JobSaveForm
-                    jobId={job.id}
-                    saved={savedJobIds.has(job.id)}
-                    action={saveJobAction}
-                  />
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {job.source}
-                </TableCell>
-              </TableRow>
-            ))}
-            {jobs.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="py-6 text-center text-sm text-muted-foreground"
-                >
-                  Sin trabajos para mostrar.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <JobTable
+          jobs={jobs}
+          savedJobIds={savedJobIds}
+          action={saveJobAction}
+          variant="list"
+        />
       </section>
     </div>
   );

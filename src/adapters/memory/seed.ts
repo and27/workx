@@ -87,6 +87,7 @@ const seedJobsBase = (data: {
   location: string;
   seniority: string;
   tags: string[];
+  description?: string | null;
   publishedAt?: isoDateTime | null;
   createdOffsetDays: number;
   updatedOffsetDays: number;
@@ -100,6 +101,7 @@ const seedJobsBase = (data: {
   location: data.location,
   seniority: data.seniority,
   tags: data.tags,
+  description: data.description ?? null,
   publishedAt: data.publishedAt ?? null,
   createdAt: toIso(addDays(seedToday, data.createdOffsetDays)),
   updatedAt: toIso(addDays(seedToday, data.updatedOffsetDays)),

@@ -13,6 +13,7 @@ export type jobSourceRecord = {
   location: string;
   seniority: string;
   tags: string[];
+  description: string | null;
   sourceUrl: string;
   publishedAt: isoDateTime | null;
 };

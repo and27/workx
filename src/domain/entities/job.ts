@@ -10,6 +10,7 @@ export type job = {
   location: string;
   seniority: string;
   tags: string[];
+  description: string | null;
   publishedAt: isoDateTime | null;
   createdAt: isoDateTime;
   updatedAt: isoDateTime;

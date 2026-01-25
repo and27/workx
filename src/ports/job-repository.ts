@@ -16,6 +16,7 @@ export type jobUpsertRecord = {
   location: string;
   seniority: string;
   tags: string[];
+  description: string | null;
   sourceUrl: string | null;
   publishedAt: isoDateTime | null;
 };

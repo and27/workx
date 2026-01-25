@@ -35,6 +35,7 @@ export const createIngestJobsUseCase =
       location: job.location,
       seniority: job.seniority,
       tags: job.tags,
+      description: job.description ?? null,
       sourceUrl: job.sourceUrl,
       publishedAt: job.publishedAt,
     }));
