@@ -59,6 +59,11 @@ describe("listInbox", () => {
         id: "none",
         nextActionAt: null,
       }),
+      makeApplication({
+        id: "archived",
+        status: "archived",
+        nextActionAt: addDaysDateOnly(base, -3),
+      }),
     ];
 
     const usecase = createListInboxUseCase({

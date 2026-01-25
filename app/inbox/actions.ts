@@ -8,6 +8,21 @@ const revalidateAll = () => {
   revalidatePath("/applications");
 };
 
+export async function archiveAction(formData: FormData) {
+  const id = formData.get("applicationId");
+  if (typeof id !== "string" || id.length === 0) {
+    throw new Error("applicationId requerido.");
+  }
+
+  const { archiveApplication } = await getUseCases();
+  const result = await archiveApplication({ id });
+  if (!result.ok) {
+    throw result.error;
+  }
+
+  revalidateAll();
+}
+
 export async function markDoneAction(formData: FormData) {
   const id = formData.get("applicationId");
   if (typeof id !== "string" || id.length === 0) {

@@ -29,7 +29,7 @@ create table if not exists public.applications (
 
 alter table public.applications
   add constraint applications_status_chk
-  check (status in ('saved','applied','screen','tech','offer','rejected','ghosted'));
+  check (status in ('saved','applied','screen','tech','offer','rejected','ghosted','archived'));
 
 alter table public.applications
   add constraint applications_priority_chk
