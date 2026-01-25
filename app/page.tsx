@@ -13,7 +13,7 @@ import JobSaveForm from "@/app/jobs/JobSaveForm";
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
 
-import { formatDate } from "@/src/lib/format";
+import { formatDate, formatRelativeDate } from "@/src/lib/format";
 
 export default async function Home() {
   const { listInbox, listApplications, listJobs, listApplicationLogs } =
@@ -102,37 +102,41 @@ export default async function Home() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Rol</TableHead>
-                <TableHead>Empresa</TableHead>
-                <TableHead>Fuente</TableHead>
-                <TableHead>Accion</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Empresa</TableHead>
+              <TableHead>Fuente</TableHead>
+              <TableHead>Publicado</TableHead>
+              <TableHead>Accion</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {jobs.slice(0, 5).map((job) => (
+              <TableRow key={job.id}>
+                <TableCell>{job.role}</TableCell>
+                <TableCell>{job.company}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {job.source}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {formatRelativeDate(job.publishedAt)}
+                </TableCell>
+                <TableCell>
+                  <JobSaveForm
+                    jobId={job.id}
+                    saved={savedJobIds.has(job.id)}
+                    action={saveJobAction}
+                  />
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobs.slice(0, 5).map((job) => (
-                <TableRow key={job.id}>
-                  <TableCell>{job.role}</TableCell>
-                  <TableCell>{job.company}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {job.source}
-                  </TableCell>
-                  <TableCell>
-                    <JobSaveForm
-                      jobId={job.id}
-                      saved={savedJobIds.has(job.id)}
-                      action={saveJobAction}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-              {jobs.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="py-4 text-sm text-muted-foreground"
-                  >
-                    Sin trabajos para mostrar.
-                  </TableCell>
+            ))}
+            {jobs.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="py-4 text-sm text-muted-foreground"
+                >
+                  Sin trabajos para mostrar.
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>
