@@ -82,7 +82,15 @@ const InboxSection = ({
   </Card>
 );
 
-export default async function InboxPage() {
+type inboxPageProps = {
+  searchParams?: Promise<{
+    filter?: string;
+  }>;
+};
+
+export default async function InboxPage({ searchParams }: inboxPageProps) {
+  const params = (await searchParams) ?? {};
+  const filter = params.filter;
   const { listInbox } = await getUseCases();
   const { overdue, today, upcoming } = await listInbox();
 
@@ -96,27 +104,39 @@ export default async function InboxPage() {
       </header>
 
       <div className="grid gap-4">
-        <InboxSection
-          title="Vencidas"
-          emptyLabel="No tienes acciones vencidas."
-          items={overdue}
-          onMarkDone={markDoneAction}
-          onReschedule={rescheduleAction}
-        />
-        <InboxSection
-          title="Hoy"
-          emptyLabel="Sin acciones para hoy."
-          items={today}
-          onMarkDone={markDoneAction}
-          onReschedule={rescheduleAction}
-        />
-        <InboxSection
-          title="Proximas"
-          emptyLabel="Sin acciones proximas."
-          items={upcoming}
-          onMarkDone={markDoneAction}
-          onReschedule={rescheduleAction}
-        />
+        {filter === "overdue" ? (
+          <InboxSection
+            title="Vencidas"
+            emptyLabel="No tienes acciones vencidas."
+            items={overdue}
+            onMarkDone={markDoneAction}
+            onReschedule={rescheduleAction}
+          />
+        ) : (
+          <>
+            <InboxSection
+              title="Vencidas"
+              emptyLabel="No tienes acciones vencidas."
+              items={overdue}
+              onMarkDone={markDoneAction}
+              onReschedule={rescheduleAction}
+            />
+            <InboxSection
+              title="Hoy"
+              emptyLabel="Sin acciones para hoy."
+              items={today}
+              onMarkDone={markDoneAction}
+              onReschedule={rescheduleAction}
+            />
+            <InboxSection
+              title="Proximas"
+              emptyLabel="Sin acciones proximas."
+              items={upcoming}
+              onMarkDone={markDoneAction}
+              onReschedule={rescheduleAction}
+            />
+          </>
+        )}
       </div>
     </div>
   );
