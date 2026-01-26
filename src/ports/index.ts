@@ -18,3 +18,7 @@ export type {
   jobSourceQuery,
   jobSourceRecord,
 } from "@/src/ports/job-source";
+export type {
+  jobTriageDecision,
+  jobTriagePort,
+} from "@/src/ports/job-triage";

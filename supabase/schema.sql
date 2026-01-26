@@ -9,6 +9,10 @@ create table if not exists public.jobs (
   seniority text not null,
   tags text[] not null default '{}'::text[],
   description text null,
+  triage_status text null,
+  triage_reasons text[] null,
+  triaged_at timestamptz null,
+  triage_provider text null,
   published_at timestamptz null,
   created_at timestamptz not null,
   updated_at timestamptz not null

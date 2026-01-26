@@ -1,6 +1,7 @@
 import { job } from "@/src/domain/entities/job";
 import {
   jobRepository,
+  jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
 } from "@/src/ports/job-repository";
@@ -67,6 +68,10 @@ const applyUpsert = (
     seniority: record.seniority,
     tags: record.tags,
     description: record.description,
+    triageStatus: null,
+    triageReasons: null,
+    triagedAt: null,
+    triageProvider: null,
     publishedAt: record.publishedAt,
     createdAt: now,
     updatedAt: now,
@@ -94,6 +99,12 @@ export const createMemoryJobRepository = (
       if (tags.length > 0 && !matchesTags(record, tags)) {
         return false;
       }
+      if (query.triageStatus) {
+        if (query.triageStatus === "untriaged") {
+          return record.triageStatus === null;
+        }
+        return record.triageStatus === query.triageStatus;
+      }
       return true;
     });
   },
@@ -106,5 +117,21 @@ export const createMemoryJobRepository = (
     );
     const created = results.filter((result) => result.created).length;
     return { created, updated: input.jobs.length - created };
+  },
+  async updateTriage(input: { id: string; patch: jobTriageUpdate }) {
+    const index = store.jobs.findIndex((record) => record.id === input.id);
+    if (index < 0) {
+      throw new Error(`Job not found: ${input.id}`);
+    }
+    const current = store.jobs[index];
+    const updated = {
+      ...current,
+      triageStatus: input.patch.triageStatus,
+      triageReasons: input.patch.triageReasons,
+      triagedAt: input.patch.triagedAt,
+      triageProvider: input.patch.triageProvider,
+    };
+    store.jobs[index] = updated;
+    return updated;
   },
 });

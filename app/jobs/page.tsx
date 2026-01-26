@@ -11,12 +11,14 @@ import {
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
 import JobTable from "@/src/components/JobTable";
+import TriageControls from "@/app/jobs/TriageControls";
 
 type jobsPageProps = {
   searchParams?: Promise<{
     q?: string;
     source?: string;
     seniority?: string;
+    triage?: string;
   }>;
 };
 
@@ -26,14 +28,22 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
   const search = params.q?.trim() ?? "";
   const rawSource = params.source;
   const rawSeniority = params.seniority;
+  const rawTriage = params.triage;
   const source = rawSource && rawSource !== "all" ? rawSource : undefined;
   const seniority =
     rawSeniority && rawSeniority !== "all" ? rawSeniority : undefined;
+  const triageStatus =
+    rawTriage === "shortlist" ||
+    rawTriage === "maybe" ||
+    rawTriage === "reject"
+      ? rawTriage
+      : undefined;
 
   const jobs = await listJobs({
     search: search || undefined,
     source,
     seniority,
+    triageStatus,
   });
   const allJobs = await listJobs();
   const applications = await listApplications();
@@ -109,6 +119,22 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="min-w-[160px]">
+              <label className="text-xs text-muted-foreground" htmlFor="triage">
+                Triage
+              </label>
+              <Select name="triage" defaultValue={rawTriage ?? "all"}>
+                <SelectTrigger id="triage" className="mt-1 w-full">
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="shortlist">Seleccionados</SelectItem>
+                  <SelectItem value="maybe">Quizas</SelectItem>
+                  <SelectItem value="reject">Rechazados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex items-center gap-2">
               <Button type="submit" variant="outline" size="sm">
                 Filtrar
@@ -118,6 +144,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
               </Button>
             </div>
           </form>
+          <TriageControls />
         </div>
 
         <JobTable

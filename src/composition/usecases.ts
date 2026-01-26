@@ -8,6 +8,8 @@ import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
+import { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
+import { defaultUserProfile } from "@/src/composition/user-profile";
 
 let _usecases: Awaited<ReturnType<typeof buildUseCases>> | null = null;
 
@@ -27,6 +29,11 @@ async function buildUseCases() {
     ingestJobs: createIngestJobsUseCase({
       jobSource: repositories.jobSource,
       jobRepository: repositories.jobRepository,
+    }),
+    triageJobs: createTriageJobsUseCase({
+      jobRepository: repositories.jobRepository,
+      jobTriage: repositories.jobTriage,
+      profile: defaultUserProfile,
     }),
     createApplicationFromJob: createApplicationFromJobUseCase({
       applicationRepository: repositories.applicationRepository,

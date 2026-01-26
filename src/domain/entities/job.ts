@@ -1,4 +1,6 @@
 import { isoDateTime } from "@/src/domain/types/iso-date-time";
+import { triageProvider } from "@/src/domain/types/triage-provider";
+import { triageStatus } from "@/src/domain/types/triage-status";
 
 export type job = {
   id: string;
@@ -11,6 +13,10 @@ export type job = {
   seniority: string;
   tags: string[];
   description: string | null;
+  triageStatus: triageStatus | null;
+  triageReasons: string[] | null;
+  triagedAt: isoDateTime | null;
+  triageProvider: triageProvider | null;
   publishedAt: isoDateTime | null;
   createdAt: isoDateTime;
   updatedAt: isoDateTime;

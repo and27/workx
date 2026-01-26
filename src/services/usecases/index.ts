@@ -2,6 +2,11 @@ export type { inboxGroups } from "@/src/services/usecases/list-inbox";
 export type { listApplicationsInput } from "@/src/services/usecases/list-applications";
 export type { listJobsInput } from "@/src/services/usecases/list-jobs";
 export type { ingestJobsInput } from "@/src/services/usecases/ingest-jobs";
+export type {
+  triageJobsInput,
+  triageJobsDeps,
+  triageJobsOutput,
+} from "@/src/services/usecases/triage-jobs";
 export type { getApplicationInput } from "@/src/services/usecases/get-application";
 export type {
   listApplicationLogsInput,
@@ -23,6 +28,7 @@ export { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 export { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
 export { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 export { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
+export { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
 export { createGetApplicationUseCase } from "@/src/services/usecases/get-application";
 export { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
 export { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";

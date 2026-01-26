@@ -3,6 +3,7 @@ import { supabase } from "@/src/adapters/supabase/client";
 import { job } from "@/src/domain/entities/job";
 import {
   jobRepository,
+  jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
 } from "@/src/ports/job-repository";
@@ -18,6 +19,10 @@ type jobRow = {
   seniority: string;
   tags: string[];
   description: string | null;
+  triage_status: string | null;
+  triage_reasons: string[] | null;
+  triaged_at: string | null;
+  triage_provider: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -34,6 +39,10 @@ const toJob = (row: jobRow): job => ({
   seniority: row.seniority,
   tags: row.tags ?? [],
   description: row.description ?? null,
+  triageStatus: row.triage_status ?? null,
+  triageReasons: row.triage_reasons ?? null,
+  triagedAt: row.triaged_at ?? null,
+  triageProvider: row.triage_provider ?? null,
   publishedAt: row.published_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -72,6 +81,13 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     const tags = query.tags?.filter(Boolean) ?? [];
     if (tags.length > 0) {
       builder = builder.contains("tags", tags);
+    }
+    if (query.triageStatus) {
+      if (query.triageStatus === "untriaged") {
+        builder = builder.is("triage_status", null);
+      } else {
+        builder = builder.eq("triage_status", query.triageStatus);
+      }
     }
 
     const { data, error } = await builder;
@@ -165,5 +181,27 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     }
 
     return { created: toInsert.length, updated: toUpdate.length };
+  },
+  async updateTriage(input: { id: string; patch: jobTriageUpdate }) {
+    const { data, error } = await supabase
+      .from("jobs")
+      .update({
+        triage_status: input.patch.triageStatus,
+        triage_reasons: input.patch.triageReasons,
+        triaged_at: input.patch.triagedAt,
+        triage_provider: input.patch.triageProvider,
+        updated_at: input.patch.triagedAt ?? new Date().toISOString(),
+      })
+      .eq("id", input.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    if (!data) {
+      throw new Error(`Job not found: ${input.id}`);
+    }
+    return toJob(data as jobRow);
   },
 });
