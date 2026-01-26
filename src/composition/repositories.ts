@@ -8,6 +8,7 @@ import {
 } from "@/src/adapters/memory/seed";
 import { memoryStore } from "@/src/adapters/memory/store";
 import { createRemotiveJobSource } from "@/src/adapters/remotive/job-source";
+import { createJobTriageAdapter } from "@/src/adapters/triage/job-triage";
 
 type globalStore = { __workxMemoryStore?: memoryStore };
 
@@ -34,6 +35,7 @@ const createMemoryRepositories = () => {
     applicationLogRepository: createMemoryApplicationLogRepository(store),
     jobRepository: createMemoryJobRepository(store),
     jobSource: createRemotiveJobSource(),
+    jobTriage: createJobTriageAdapter(),
   };
 };
 
@@ -55,5 +57,6 @@ export async function getRepositories() {
     applicationLogRepository: createSupabaseApplicationLogRepository(),
     jobRepository: createSupabaseJobRepository(),
     jobSource: createRemotiveJobSource(),
+    jobTriage: createJobTriageAdapter(),
   };
 }

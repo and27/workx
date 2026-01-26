@@ -33,6 +33,13 @@ const stopRowClick = (event: MouseEvent | KeyboardEvent) => {
   event.stopPropagation();
 };
 
+const triageLabel = (status: job["triageStatus"]) => {
+  if (status === "shortlist") return "Seleccionado";
+  if (status === "maybe") return "Quizas";
+  if (status === "reject") return "Rechazado";
+  return null;
+};
+
 export default function JobTable({
   jobs,
   savedJobIds,
@@ -87,20 +94,36 @@ export default function JobTable({
               }}
             >
               <TableCell className="font-medium">
-                {variant === "list" && job.sourceUrl ? (
-                  <a
-                    href={job.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline-offset-4 hover:underline"
-                    onClick={stopRowClick}
-                    onKeyDown={stopRowClick}
-                  >
-                    {job.role}
-                  </a>
-                ) : (
-                  job.role
-                )}
+                <div className="space-y-1">
+                  <div>
+                    {variant === "list" && job.sourceUrl ? (
+                      <a
+                        href={job.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline-offset-4 hover:underline"
+                        onClick={stopRowClick}
+                        onKeyDown={stopRowClick}
+                      >
+                        {job.role}
+                      </a>
+                    ) : (
+                      job.role
+                    )}
+                  </div>
+                  {(job.triageStatus || job.triageReasons?.length) && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      {triageLabel(job.triageStatus) && (
+                        <Badge variant="outline">
+                          {triageLabel(job.triageStatus)}
+                        </Badge>
+                      )}
+                      {job.triageReasons?.slice(0, 2).map((reason) => (
+                        <span key={reason}>{reason}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </TableCell>
               <TableCell>{job.company}</TableCell>
               {variant === "list" && (

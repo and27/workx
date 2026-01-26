@@ -18,6 +18,11 @@ const makeJob = (overrides: Partial<job>): job => ({
   location: "Remoto",
   seniority: "Mid",
   tags: ["React"],
+  description: null,
+  triageStatus: null,
+  triageReasons: null,
+  triagedAt: null,
+  triageProvider: null,
   publishedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -39,6 +44,9 @@ describe("createApplicationFromJob", () => {
       },
       async upsertByExternalId() {
         return { created: 0, updated: 0 };
+      },
+      async updateTriage() {
+        throw new Error("Not implemented");
       },
     };
 

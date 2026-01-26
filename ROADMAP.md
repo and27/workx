@@ -1,6 +1,6 @@
 # ROADMAP – Workx
 
-Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 planned).
+Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ## Phase 0 – Execution UI (Portfolio Core) ✅
 
@@ -99,7 +99,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 planned).
 
 ---
 
-## Phase 3 – Job Triage & Ranking (Agent-Assisted) 🟡 Planned
+## Phase 3 – Job Triage & Ranking (Agent-Assisted) 🟡 In Progress
 
 **Goal:** Reduce decision fatigue by filtering and prioritizing jobs using the user’s real profile.
 
