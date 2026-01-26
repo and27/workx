@@ -1,5 +1,7 @@
 # ROADMAP – Workx
 
+Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 planned).
+
 ## Phase 0 – Execution UI (Portfolio Core) ✅
 
 **Goal:** Prove an execution-first user experience without backend dependency.
@@ -10,7 +12,7 @@
 - Inbox: Overdue / Today / Upcoming.
 - Applications as the primary working surface.
 - Jobs as discovery → convert to application.
-- Application timeline (audit log).
+- Application detail with timeline (audit log).
 - Clean Ports & Adapters architecture with memory adapter.
 - Selective TDD for use cases.
 
@@ -57,7 +59,7 @@
 
 - Manual job ingestion (Remotive source).
 - API trigger for ingestion.
-- Jobs list with basic filters in UI.
+- Jobs list in UI.
 - “Top matches today” (flat list, no ranking).
 - Deduplication via `(source, externalId)` upsert.
 
@@ -71,40 +73,63 @@
 
 ---
 
-## Phase 2.1 – Daily Decision UX (Closure)
+## Phase 2.1 – Daily Decision UX (Closure) ✅
 
-**Goal:** Make discovery and execution actionable without ambiguity.
-
-Scope:
-
-- Overdue metrics link to actionable views.
-- Clear temporal context for job discovery (publishedAt).
-- Reduce “informational-only” UI elements.
-
-Exit criteria:
-
-- User can identify overdue actions in one click.
-- User understands job freshness at a glance.
-
----
-
-## Phase 3 – Discovery Ranking (Light, Future)
-
-**Goal:** Reduce decision fatigue by prioritizing relevant jobs.
+**Goal:** Remove ambiguity and friction from daily decisions.
 
 **Delivers:**
 
-- Basic ranking heuristics (seniority, keywords, recency).
-- Ordered “Top matches today”.
-- Improved deduplication rules.
+- Actionable Home metrics (Overdue card navigates to items).
+- Clear temporal context in discovery (publishedAt / recency).
+- Ability to close loops:
+  - Reprogram action
+  - Mark action as done
+  - Archive/close stale applications
+- Job row interaction with JD preview (modal/sheet).
 
 **Non-goals:**
 
-- ML models, heavy scoring pipelines, mass scraping.
+- Automation, ranking, agents.
 
 **Exit criteria:**
 
-- Jobs appear pre-sorted by relevance with minimal configuration.
+- User knows what to do today in < 60 seconds.
+- Overdue items are resolvable without workaround.
+- Discovery decisions do not require opening external sites by default.
+
+---
+
+## Phase 3 – Job Triage & Ranking (Agent-Assisted) 🟡 Planned
+
+**Goal:** Reduce decision fatigue by filtering and prioritizing jobs using the user’s real profile.
+
+**Delivers:**
+
+- Explicit user profile:
+  - Must-have skills
+  - Hard-no constraints
+  - Preferences
+- Two-stage job triage:
+  - Coarse filtering (rules / local LLM such as Ollama).
+  - Disambiguation for “maybe” cases (LLM, explainable).
+- Job classification:
+  - `shortlist / maybe / reject`
+  - Reasons and dealbreakers
+- Default view surfaces only “Selected for you”.
+- Lightweight scoring (heuristic, not ML-heavy).
+
+**Non-goals:**
+
+- Auto-apply.
+- Fully autonomous agents.
+- Large-scale scraping.
+- Multi-user personalization.
+
+**Exit criteria:**
+
+- User reviews significantly fewer jobs per day.
+- High-confidence jobs surface without reading full JDs.
+- Every triage decision is explainable (“why this / why not”).
 
 ---
 
@@ -121,8 +146,10 @@ Exit criteria:
 
 **Non-goals:**
 
-- Full ATS replacement, enterprise features.
+- Full ATS replacement.
+- Enterprise integrations.
 
 **Exit criteria:**
 
-- Measurable reduction in manual tracking and missed follow-ups.
+- Measurable reduction in missed follow-ups.
+- Clear productivity gain for a single user.
