@@ -123,7 +123,7 @@ const fetchOllama = async (
 
   try {
     const response = await fetch(
-      `${baseUrl.replace(/\\/$/, "")}/api/generate`,
+      `${baseUrl.replace(/\/$/, "")}/api/generate`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -197,3 +197,4 @@ export const createJobTriageAdapter = (): jobTriagePort => ({
   disambiguate: async ({ job: jobRecord, profile, previous }) =>
     fetchOpenAI(jobRecord, profile, previous),
 });
+
