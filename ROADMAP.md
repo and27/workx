@@ -112,6 +112,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 - Two-stage job triage:
   - Coarse filtering (rules / local LLM such as Ollama).
   - Disambiguation for “maybe” cases (LLM, explainable).
+- Proposed: OpenAI fallback when Ollama is unavailable (V0 optional).
 - Job classification:
   - `shortlist / maybe / reject`
   - Reasons and dealbreakers
