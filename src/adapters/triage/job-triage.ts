@@ -8,6 +8,8 @@ type triagePayload = {
   decision?: string;
   status?: string;
   reasons?: unknown;
+  confidence?: unknown;
+  tags?: unknown;
 };
 
 const trimText = (value: string, maxLength = 2000) =>
@@ -58,6 +60,26 @@ const normalizeReasons = (value: unknown): string[] => {
   return [];
 };
 
+const normalizeTags = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const normalizeConfidence = (value: unknown): number | null => {
+  const numeric =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : Number.NaN;
+  if (!Number.isFinite(numeric)) return null;
+  return Math.min(1, Math.max(0, numeric));
+};
+
 const extractJson = (text: string): triagePayload | null => {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return null;
@@ -75,17 +97,25 @@ const toDecision = (
   if (!payload) return null;
   const decision = parseDecision(payload.decision ?? payload.status);
   if (!decision) return null;
+  const confidence = normalizeConfidence(payload.confidence);
   const reasons = normalizeReasons(payload.reasons);
+  const tags = normalizeTags(payload.tags);
+  const status =
+    provider === "ollama" && (confidence === null || confidence < 0.75)
+      ? "maybe"
+      : decision;
   return {
-    status: decision,
+    status,
     reasons,
     provider,
+    confidence,
+    tags,
   };
 };
 
 const buildCoarsePrompt = (jobRecord: job, profile: userProfile) => `You are a job triage assistant.
 Return JSON only in the form:
-{"decision":"shortlist|maybe|reject","reasons":["reason 1","reason 2"]}
+{"decision":"shortlist|maybe|reject","confidence":0.0,"reasons":["reason 1","reason 2"],"tags":["tag 1","tag 2"]}
 
 User profile:
 ${buildProfileText(profile)}
@@ -197,4 +227,3 @@ export const createJobTriageAdapter = (): jobTriagePort => ({
   disambiguate: async ({ job: jobRecord, profile, previous }) =>
     fetchOpenAI(jobRecord, profile, previous),
 });
-
