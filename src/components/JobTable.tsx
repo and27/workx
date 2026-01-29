@@ -24,7 +24,7 @@ type jobTableProps = {
   savedJobIds: string[];
   action: (
     prevState: saveJobState | null,
-    formData: FormData
+    formData: FormData,
   ) => Promise<saveJobState>;
   variant: jobTableVariant;
 };
@@ -40,6 +40,11 @@ const triageLabel = (status: job["triageStatus"]) => {
   return null;
 };
 
+const triageBadgeClass = (status: job["triageStatus"]) => {
+  if (status === "shortlist") return "border-chart-2 text-chart-2";
+  return "";
+};
+
 export default function JobTable({
   jobs,
   savedJobIds,
@@ -50,13 +55,13 @@ export default function JobTable({
   const savedSet = useMemo(() => new Set(savedJobIds), [savedJobIds]);
   const selectedJob = useMemo(
     () => jobs.find((job) => job.id === activeJobId) ?? null,
-    [jobs, activeJobId]
+    [jobs, activeJobId],
   );
 
   const handleOpen = (jobId: string) => setActiveJobId(jobId);
   const handleClose = () => setActiveJobId(null);
 
-  const emptyColSpan = variant === "home" ? 5 : 8;
+  const emptyColSpan = variant === "home" ? 5 : 7;
 
   return (
     <>
@@ -67,15 +72,14 @@ export default function JobTable({
             <TableHead>Empresa</TableHead>
             {variant === "list" && (
               <>
-                <TableHead>Ubicacion</TableHead>
                 <TableHead>Senioridad</TableHead>
-                <TableHead>Tags</TableHead>
               </>
             )}
             <TableHead>Publicado</TableHead>
             <TableHead>Accion</TableHead>
             {variant === "list" && <TableHead>Fuente</TableHead>}
             {variant === "home" && <TableHead>Fuente</TableHead>}
+            {variant === "list" && <TableHead>Tags</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -94,54 +98,49 @@ export default function JobTable({
               }}
             >
               <TableCell className="font-medium">
-                <div className="space-y-1">
-                  <div>
-                    {variant === "list" && job.sourceUrl ? (
-                      <a
-                        href={job.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline-offset-4 hover:underline"
-                        onClick={stopRowClick}
-                        onKeyDown={stopRowClick}
-                      >
-                        {job.role}
-                      </a>
-                    ) : (
-                      job.role
-                    )}
-                  </div>
-                  {(job.triageStatus || job.triageReasons?.length) && (
+                <div className="space-y-0">
+                  {triageLabel(job.triageStatus) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      {triageLabel(job.triageStatus) && (
-                        <Badge variant="outline">
-                          {triageLabel(job.triageStatus)}
-                        </Badge>
-                      )}
-                      {job.triageReasons?.slice(0, 2).map((reason) => (
-                        <span key={reason}>{reason}</span>
-                      ))}
+                      <Badge
+                        variant="outline"
+                        className={`${triageBadgeClass(job.triageStatus)} px-2`}
+                      >
+                        {triageLabel(job.triageStatus)}
+                      </Badge>
                     </div>
                   )}
+                  <div className="space-y-1 pl-1">
+                    <div>
+                      {variant === "list" && job.sourceUrl ? (
+                        <a
+                          href={job.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline-offset-4 hover:underline"
+                          onClick={stopRowClick}
+                          onKeyDown={stopRowClick}
+                        >
+                          {job.role}
+                        </a>
+                      ) : (
+                        job.role
+                      )}
+                    </div>
+                  </div>
                 </div>
               </TableCell>
-              <TableCell>{job.company}</TableCell>
+              <TableCell>
+                <div className="space-y-1">
+                  <div className="font-medium">{job.company}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {job.location}
+                  </div>
+                </div>
+              </TableCell>
               {variant === "list" && (
                 <>
                   <TableCell className="text-muted-foreground">
-                    {job.location}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
                     {job.seniority}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pr-1">
-                      {job.tags.map((tag) => (
-                        <Badge key={tag} variant="outline">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
                   </TableCell>
                 </>
               )}
@@ -163,6 +162,17 @@ export default function JobTable({
               {variant === "home" && (
                 <TableCell className="text-muted-foreground">
                   {job.source}
+                </TableCell>
+              )}
+              {variant === "list" && (
+                <TableCell className="min-w-[240px]">
+                  <div className="flex max-h-12 flex-wrap gap-1 overflow-hidden pr-1">
+                    {job.tags.map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </TableCell>
               )}
             </TableRow>
