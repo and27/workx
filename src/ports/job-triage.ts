@@ -7,6 +7,8 @@ export type jobTriageDecision = {
   status: triageStatus;
   reasons: string[];
   provider: triageProvider;
+  confidence: number | null;
+  tags: string[];
 };
 
 export type jobTriagePort = {
