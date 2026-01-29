@@ -106,6 +106,23 @@ export default function JobDetailDialog({
           )}
         </div>
 
+        {(job.triageStatus || job.triageReasons?.length) && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">Razones del triage</h3>
+            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+              {job.triageReasons && job.triageReasons.length > 0 ? (
+                <ul className="list-disc space-y-1 pl-4">
+                  {job.triageReasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span>Sin razones registradas.</span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <h3 className="text-sm font-semibold">Descripcion</h3>
           <div
