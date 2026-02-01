@@ -115,7 +115,7 @@ export default function JobTable({
                         <a
                           href={job.sourceUrl}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener"
                           className="underline-offset-4 hover:underline"
                           onClick={stopRowClick}
                           onKeyDown={stopRowClick}

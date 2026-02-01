@@ -140,7 +140,7 @@ export default function JobDetailDialog({
         </div>
         {job.sourceUrl && (
           <Button asChild variant="outline" size="sm">
-            <a href={job.sourceUrl} target="_blank" rel="noreferrer">
+            <a href={job.sourceUrl} target="_blank" rel="noopener">
               Abrir vacante
             </a>
           </Button>
