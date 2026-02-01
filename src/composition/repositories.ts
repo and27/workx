@@ -10,6 +10,7 @@ import { memoryStore } from "@/src/adapters/memory/store";
 import { createJobSourceRouter } from "@/src/adapters/job-source-router";
 import { createRemotiveJobSource } from "@/src/adapters/remotive/job-source";
 import { createJobTriageAdapter } from "@/src/adapters/triage/job-triage";
+import { createWeb3JobSource } from "@/src/adapters/web3-jobs/job-source";
 import { createWwrJobSource } from "@/src/adapters/wwr/job-source";
 
 type globalStore = { __workxMemoryStore?: memoryStore };
@@ -38,6 +39,7 @@ const createMemoryRepositories = () => {
     jobRepository: createMemoryJobRepository(store),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
+      { source: "Web3", adapter: createWeb3JobSource() },
       { source: "WWR", adapter: createWwrJobSource() },
     ]),
     jobTriage: createJobTriageAdapter(),
@@ -63,6 +65,7 @@ export async function getRepositories() {
     jobRepository: createSupabaseJobRepository(),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
+      { source: "Web3", adapter: createWeb3JobSource() },
       { source: "WWR", adapter: createWwrJobSource() },
     ]),
     jobTriage: createJobTriageAdapter(),

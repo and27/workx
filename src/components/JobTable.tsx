@@ -115,7 +115,7 @@ export default function JobTable({
                         <a
                           href={job.sourceUrl}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener"
                           className="underline-offset-4 hover:underline"
                           onClick={stopRowClick}
                           onKeyDown={stopRowClick}
@@ -129,10 +129,10 @@ export default function JobTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="max-w-sm">
                 <div className="space-y-1">
                   <div className="font-medium">{job.company}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground truncate">
                     {job.location}
                   </div>
                 </div>
