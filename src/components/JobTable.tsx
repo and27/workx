@@ -129,10 +129,10 @@ export default function JobTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="max-w-sm">
                 <div className="space-y-1">
                   <div className="font-medium">{job.company}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground truncate">
                     {job.location}
                   </div>
                 </div>
