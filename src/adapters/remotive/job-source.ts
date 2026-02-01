@@ -91,7 +91,7 @@ export const createRemotiveJobSource = (): jobSource => ({
 
     const payload = (await response.json()) as remotiveResponse;
     const records = payload.jobs.map(toSourceRecord).filter(shouldInclude);
-    const limited = query.limit ? records.slice(0, query.limit) : records;
-    return limited;
+    const limit = typeof query.limit === "number" ? query.limit : undefined;
+    return limit ? records.slice(0, limit) : records;
   },
 });

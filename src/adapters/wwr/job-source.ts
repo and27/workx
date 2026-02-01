@@ -153,14 +153,6 @@ const toSourceRecord = (item: ParsedItem): jobSourceRecord | null => {
   };
 };
 
-const toSafeLimit = (value: unknown, max = 50): number | null => {
-  if (typeof value !== "number") return null;
-  if (!Number.isFinite(value)) return null;
-  const floored = Math.floor(value);
-  if (floored <= 0) return null;
-  return Math.min(floored, max);
-};
-
 export const createWwrJobSource = (): jobSource => ({
   list: async (query = {}) => {
     if (query.source && query.source !== SOURCE) return [];
@@ -202,7 +194,7 @@ export const createWwrJobSource = (): jobSource => ({
       );
     }
 
-    const limit = toSafeLimit((query as any).limit, 50);
+    const limit = typeof query.limit === "number" ? query.limit : undefined;
     return limit ? records.slice(0, limit) : records;
   },
 });
