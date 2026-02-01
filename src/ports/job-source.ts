@@ -1,6 +1,7 @@
 import { isoDateTime } from "@/src/domain/types/iso-date-time";
 
 export type jobSourceQuery = {
+  // Use "all" (or omit) to fetch across all sources.
   source?: string;
   limit?: number;
 };
