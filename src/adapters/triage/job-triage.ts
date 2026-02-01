@@ -12,7 +12,7 @@ type triagePayload = {
   tags?: unknown;
 };
 
-const trimText = (value: string, maxLength = 2000) =>
+const trimText = (value: string, maxLength = 1200) =>
   value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
 
 const buildProfileText = (profile: userProfile) => {
@@ -42,7 +42,9 @@ const buildJobText = (jobRecord: job) => {
   ].join("\n");
 };
 
-const parseDecision = (value: string | undefined | null): triageStatus | null => {
+const parseDecision = (
+  value: string | undefined | null,
+): triageStatus | null => {
   if (!value) return null;
   const normalized = value.toLowerCase().trim();
   if (normalized === "shortlist") return "shortlist";
@@ -92,7 +94,7 @@ const extractJson = (text: string): triagePayload | null => {
 
 const toDecision = (
   payload: triagePayload | null,
-  provider: triageProvider
+  provider: triageProvider,
 ): jobTriageDecision | null => {
   if (!payload) return null;
   const decision = parseDecision(payload.decision ?? payload.status);
@@ -113,7 +115,10 @@ const toDecision = (
   };
 };
 
-const buildCoarsePrompt = (jobRecord: job, profile: userProfile) => `You are a job triage assistant.
+const buildCoarsePrompt = (
+  jobRecord: job,
+  profile: userProfile,
+) => `You are a job triage assistant.
 Return JSON only in the form:
 {"decision":"shortlist|maybe|reject","confidence":0.0,"reasons":["reason 1","reason 2"],"tags":["tag 1","tag 2"]}
 
@@ -127,7 +132,7 @@ ${buildJobText(jobRecord)}
 const buildDisambiguationPrompt = (
   jobRecord: job,
   profile: userProfile,
-  previous: jobTriageDecision
+  previous: jobTriageDecision,
 ) => `You are a job triage assistant.
 Return JSON only in the form:
 {"decision":"shortlist|maybe|reject","reasons":["reason 1","reason 2"]}
@@ -143,7 +148,7 @@ ${buildJobText(jobRecord)}
 
 const fetchOllama = async (
   jobRecord: job,
-  profile: userProfile
+  profile: userProfile,
 ): Promise<jobTriageDecision | null> => {
   const baseUrl = process.env.OLLAMA_BASE_URL?.trim() ?? "";
   const model = process.env.OLLAMA_MODEL?.trim() ?? "";
@@ -152,18 +157,15 @@ const fetchOllama = async (
   }
 
   try {
-    const response = await fetch(
-      `${baseUrl.replace(/\/$/, "")}/api/generate`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          prompt: buildCoarsePrompt(jobRecord, profile),
-          stream: false,
-        }),
-      }
-    );
+    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        prompt: buildCoarsePrompt(jobRecord, profile),
+        stream: false,
+      }),
+    });
 
     if (!response.ok) {
       return null;
@@ -180,7 +182,7 @@ const fetchOllama = async (
 const fetchOpenAI = async (
   jobRecord: job,
   profile: userProfile,
-  previous: jobTriageDecision
+  previous: jobTriageDecision,
 ): Promise<jobTriageDecision | null> => {
   const apiKey = process.env.OPENAI_API_KEY?.trim() ?? "";
   const model = process.env.OPENAI_MODEL?.trim() ?? "";
@@ -210,10 +212,7 @@ const fetchOpenAI = async (
       output_text?: string;
       output?: { content?: { text?: string }[] }[];
     };
-    const text =
-      data.output_text ??
-      data.output?.[0]?.content?.[0]?.text ??
-      "";
+    const text = data.output_text ?? data.output?.[0]?.content?.[0]?.text ?? "";
     const payload = text ? extractJson(text) : null;
     return toDecision(payload, "openai");
   } catch {
