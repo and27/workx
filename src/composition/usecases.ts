@@ -35,6 +35,10 @@ async function buildUseCases() {
       jobRepository: repositories.jobRepository,
       jobTriage: repositories.jobTriage,
       profile: defaultUserProfile,
+      ollamaConfigured: Boolean(
+        process.env.OLLAMA_BASE_URL?.trim() &&
+          process.env.OLLAMA_MODEL?.trim()
+      ),
     }),
     createApplicationFromJob: createApplicationFromJobUseCase({
       applicationRepository: repositories.applicationRepository,

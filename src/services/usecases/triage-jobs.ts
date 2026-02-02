@@ -25,6 +25,7 @@ export type triageJobsDeps = {
   jobRepository: jobRepository;
   jobTriage: jobTriagePort;
   profile: userProfile;
+  ollamaConfigured: boolean;
 };
 
 type openAiUsageState = {
@@ -76,6 +77,10 @@ export const createTriageJobsUseCase =
   ): Promise<result<triageJobsOutput, Error>> => {
     const mode = input.mode === "recent" ? "recent" : "new";
     const days = input.days && input.days > 0 ? input.days : 14;
+
+    if (!dependencies.ollamaConfigured) {
+      return err(new Error("Configura Ollama para analizar trabajos."));
+    }
 
     const items =
       mode === "new"
