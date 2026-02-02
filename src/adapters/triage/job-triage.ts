@@ -12,6 +12,16 @@ type triagePayload = {
   tags?: unknown;
 };
 
+type openAiPayload = {
+  finalDecision?: string;
+  fitScore?: unknown;
+  reasons?: unknown;
+  dealbreakers?: unknown;
+  matchedSkills?: unknown;
+  missingSkills?: unknown;
+  recommendedNextAction?: unknown;
+};
+
 const trimText = (value: string, maxLength = 1200) =>
   value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
 
@@ -82,13 +92,32 @@ const normalizeConfidence = (value: unknown): number | null => {
   return Math.min(1, Math.max(0, numeric));
 };
 
-const extractJson = (text: string): triagePayload | null => {
+const normalizeFitScore = (value: unknown): number | null => {
+  const numeric =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : Number.NaN;
+  if (!Number.isFinite(numeric)) return null;
+  return Math.min(100, Math.max(0, numeric));
+};
+
+const extractJson = (text: string): unknown | null => {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return null;
   try {
-    return JSON.parse(match[0]) as triagePayload;
+    return JSON.parse(match[0]) as unknown;
   } catch {
     return null;
+  }
+};
+
+const parseJsonText = (text: string): unknown | null => {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return extractJson(text);
   }
 };
 
@@ -115,6 +144,42 @@ const toDecision = (
   };
 };
 
+const toOpenAiDecision = (
+  payload: openAiPayload | null,
+): jobTriageDecision | null => {
+  if (!payload) return null;
+  const decision = parseDecision(payload.finalDecision);
+  if (!decision) return null;
+  const fitScore = normalizeFitScore(payload.fitScore);
+  const reasons = normalizeReasons(payload.reasons);
+  const dealbreakers = normalizeReasons(payload.dealbreakers);
+  const matchedSkills = normalizeReasons(payload.matchedSkills);
+  const missingSkills = normalizeReasons(payload.missingSkills);
+  const recommendedNextAction =
+    typeof payload.recommendedNextAction === "string"
+      ? payload.recommendedNextAction.trim()
+      : "";
+
+  const combinedReasons = [
+    ...reasons,
+    ...dealbreakers.map((reason) => `Dealbreaker: ${reason}`),
+    ...missingSkills.map((skill) => `Skill faltante: ${skill}`),
+    ...matchedSkills.map((skill) => `Skill match: ${skill}`),
+  ].filter(Boolean);
+
+  if (recommendedNextAction) {
+    combinedReasons.push(`Next action: ${recommendedNextAction}`);
+  }
+
+  return {
+    status: decision,
+    reasons: combinedReasons.length > 0 ? combinedReasons : reasons,
+    provider: "openai",
+    confidence: fitScore !== null ? fitScore / 100 : null,
+    tags: matchedSkills,
+  };
+};
+
 const buildCoarsePrompt = (
   jobRecord: job,
   profile: userProfile,
@@ -135,7 +200,7 @@ const buildDisambiguationPrompt = (
   previous: jobTriageDecision,
 ) => `You are a job triage assistant.
 Return JSON only in the form:
-{"decision":"shortlist|maybe|reject","reasons":["reason 1","reason 2"]}
+{"finalDecision":"shortlist|maybe|reject","fitScore":0,"reasons":["reason 1","reason 2"],"dealbreakers":["dealbreaker 1"],"matchedSkills":["skill 1"],"missingSkills":["skill 1"],"recommendedNextAction":"short suggestion"}
 
 Previous decision: ${previous.status}
 
@@ -172,7 +237,9 @@ const fetchOllama = async (
     }
 
     const data = (await response.json()) as { response?: string };
-    const payload = data.response ? extractJson(data.response) : null;
+    const payload = data.response
+      ? (parseJsonText(data.response) as triagePayload | null)
+      : null;
     return toDecision(payload, "ollama");
   } catch {
     return null;
@@ -200,7 +267,57 @@ const fetchOpenAI = async (
       body: JSON.stringify({
         model,
         input: buildDisambiguationPrompt(jobRecord, profile, previous),
-        response_format: { type: "json_object" },
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "job_triage_disambiguation",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                finalDecision: {
+                  type: "string",
+                  enum: ["shortlist", "maybe", "reject"],
+                },
+                fitScore: {
+                  type: "number",
+                  minimum: 0,
+                  maximum: 100,
+                },
+                reasons: {
+                  type: "array",
+                  items: { type: "string" },
+                  minItems: 1,
+                },
+                dealbreakers: {
+                  type: "array",
+                  items: { type: "string" },
+                },
+                matchedSkills: {
+                  type: "array",
+                  items: { type: "string" },
+                },
+                missingSkills: {
+                  type: "array",
+                  items: { type: "string" },
+                },
+                recommendedNextAction: {
+                  type: "string",
+                },
+              },
+              required: [
+                "finalDecision",
+                "fitScore",
+                "reasons",
+                "dealbreakers",
+                "matchedSkills",
+                "missingSkills",
+                "recommendedNextAction",
+              ],
+            },
+          },
+        },
       }),
     });
 
@@ -213,8 +330,10 @@ const fetchOpenAI = async (
       output?: { content?: { text?: string }[] }[];
     };
     const text = data.output_text ?? data.output?.[0]?.content?.[0]?.text ?? "";
-    const payload = text ? extractJson(text) : null;
-    return toDecision(payload, "openai");
+    const payload = text
+      ? (parseJsonText(text) as openAiPayload | null)
+      : null;
+    return toOpenAiDecision(payload);
   } catch {
     return null;
   }

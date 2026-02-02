@@ -26,13 +26,20 @@ export default function TriageControls() {
         processed?: number;
         triaged?: number;
         skipped?: number;
+        openaiUsed?: number;
+        openaiSkippedCap?: number;
         error?: string;
       };
       if (!response.ok || !payload.ok) {
         throw new Error(payload.error ?? "No pudimos analizar trabajos.");
       }
+      const skippedByCap = payload.openaiSkippedCap ?? 0;
       toast({
         title: `Analisis listo: ${payload.triaged ?? 0} actualizados.`,
+        description:
+          skippedByCap > 0
+            ? `Se omitieron ${skippedByCap} revisiones por limite diario de OpenAI.`
+            : undefined,
         variant: "success",
       });
       router.refresh();
