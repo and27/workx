@@ -35,9 +35,13 @@ export default function JobsFilters({
   const sourceValue = normalizeValue(initialSource || "all");
   const triageValue = normalizeValue(initialTriage || "shortlist");
 
-  const updateQuery = (key: string, value: string) => {
+  const updateQuery = (
+    key: string,
+    value: string,
+    options: { keepAll?: boolean } = {}
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (!value || value === "all") {
+    if (!value || (value === "all" && !options.keepAll)) {
       params.delete(key);
     } else {
       params.set(key, value);
@@ -122,7 +126,7 @@ export default function JobsFilters({
         </label>
         <Select
           value={triageValue}
-          onValueChange={(value) => updateQuery("triage", value)}
+          onValueChange={(value) => updateQuery("triage", value, { keepAll: true })}
         >
           <SelectTrigger id="triage" className="mt-1 w-full">
             <SelectValue placeholder="Seleccionados" />
