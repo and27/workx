@@ -38,13 +38,16 @@ export default function JobsFilters({
   const updateQuery = (
     key: string,
     value: string,
-    options: { keepAll?: boolean } = {}
+    options: { keepAll?: boolean; resetPage?: boolean } = {}
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     if (!value || (value === "all" && !options.keepAll)) {
       params.delete(key);
     } else {
       params.set(key, value);
+    }
+    if (options.resetPage) {
+      params.delete("page");
     }
     const query = params.toString();
     if (query === searchParams.toString()) {
@@ -55,6 +58,10 @@ export default function JobsFilters({
 
   useEffect(() => {
     const trimmed = search.trim();
+    const currentQuery = searchParams.get("q") ?? "";
+    if (trimmed === currentQuery) {
+      return;
+    }
     const timeout = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (!trimmed) {
@@ -62,6 +69,7 @@ export default function JobsFilters({
       } else {
         params.set("q", trimmed);
       }
+      params.delete("page");
       const query = params.toString();
       if (query === searchParams.toString()) {
         return;
@@ -105,7 +113,9 @@ export default function JobsFilters({
         </label>
         <Select
           value={sourceValue}
-          onValueChange={(value) => updateQuery("source", value)}
+          onValueChange={(value) =>
+            updateQuery("source", value, { resetPage: true })
+          }
         >
           <SelectTrigger id="source" className="mt-1 w-full">
             <SelectValue placeholder="Todas" />
@@ -126,7 +136,9 @@ export default function JobsFilters({
         </label>
         <Select
           value={triageValue}
-          onValueChange={(value) => updateQuery("triage", value, { keepAll: true })}
+          onValueChange={(value) =>
+            updateQuery("triage", value, { keepAll: true, resetPage: true })
+          }
         >
           <SelectTrigger id="triage" className="mt-1 w-full">
             <SelectValue placeholder="Seleccionados" />

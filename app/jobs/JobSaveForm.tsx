@@ -11,7 +11,7 @@ type jobSaveFormProps = {
   saved: boolean;
   action: (
     prevState: saveJobState | null,
-    formData: FormData
+    formData: FormData,
   ) => Promise<saveJobState>;
 };
 
@@ -24,11 +24,7 @@ const SubmitButton = ({ saved }: submitButtonProps) => {
   const disabled = pending || saved;
   return (
     <Button type="submit" variant="outline" size="sm" disabled={disabled}>
-      {pending
-        ? "Guardando..."
-        : saved
-        ? "Postulacion guardada"
-        : "Guardar como postulacion"}
+      {pending ? "Guardando..." : saved ? "Guardada" : "Guardar"}
     </Button>
   );
 };
