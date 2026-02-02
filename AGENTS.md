@@ -145,6 +145,7 @@ A PR is "done" only when:
 - Integration branch is `dev`; feature branches PR into `dev`.
 - `main` is release-only; merge `dev` → `main` when cutting a version.
 - All changes require a GitHub issue/ticket **before** implementation (no exceptions).
+- Changes must align with the current roadmap phase/epic; out-of-order work requires explicit agreement recorded in the issue and PR.
 - Use the PR template in `.github/pull_request_template.md`.
 - PR body format must include **Summary** and **Testing** sections.
 - Always set PR body via `gh pr create/edit --body-file` using a PowerShell here-string:
