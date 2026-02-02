@@ -137,7 +137,7 @@ export default function IngestDialog() {
               <SelectTrigger id="ingest-source" className="mt-1 w-full">
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent portalContainer={dialogRef.current}>
                 <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="Remotive">Remotive</SelectItem>
                 <SelectItem value="WWR">WWR</SelectItem>
