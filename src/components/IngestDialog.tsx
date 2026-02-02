@@ -105,66 +105,91 @@ export default function IngestDialog() {
 
       <dialog
         ref={dialogRef}
-        className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/40"
+        className="w-full h-full bg-transparent p-0 text-foreground backdrop:bg-black/40"
         onCancel={(event) => {
           event.preventDefault();
           handleClose();
         }}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold">Ingestar trabajos</h2>
-            <p className="text-xs text-muted-foreground">
-              Selecciona la fuente y el limite para traer trabajos.
-            </p>
-          </div>
-          <Button type="button" variant="outline" size="sm" onClick={handleClose}>
-            Cerrar
-          </Button>
-        </div>
+        <div className="flex h-full items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-lg border border-border bg-background p-0 text-foreground shadow-xl">
+            <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold">Ingestar trabajos</h2>
+                <p className="text-xs text-muted-foreground">
+                  Selecciona la fuente y el limite para traer trabajos.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleClose}
+              >
+                Cerrar
+              </Button>
+            </div>
 
-        <div className="space-y-4 p-4">
-          <div>
-            <label className="text-xs text-muted-foreground" htmlFor="ingest-source">
-              Fuente
-            </label>
-            <Select
-              value={source}
-              onValueChange={(value) => setSource(value as ingestSource)}
-              modal={false}
-            >
-              <SelectTrigger id="ingest-source" className="mt-1 w-full">
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent portalContainer={dialogRef.current}>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="Remotive">Remotive</SelectItem>
-                <SelectItem value="WWR">WWR</SelectItem>
-                <SelectItem value="Web3">Web3</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground" htmlFor="ingest-limit">
-              Limite
-            </label>
-            <Input
-              id="ingest-limit"
-              value={limitInput}
-              onChange={(event) => setLimitInput(event.target.value)}
-              inputMode="numeric"
-              className="mt-1"
-            />
-          </div>
-        </div>
+            <div className="space-y-4 p-4">
+              <div>
+                <label
+                  className="text-xs text-muted-foreground"
+                  htmlFor="ingest-source"
+                >
+                  Fuente
+                </label>
+                <Select
+                  value={source}
+                  onValueChange={(value) => setSource(value as ingestSource)}
+                  modal={false}
+                >
+                  <SelectTrigger id="ingest-source" className="mt-1 w-full">
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent portalContainer={dialogRef.current}>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="Remotive">Remotive</SelectItem>
+                    <SelectItem value="WWR">WWR</SelectItem>
+                    <SelectItem value="Web3">Web3</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label
+                  className="text-xs text-muted-foreground"
+                  htmlFor="ingest-limit"
+                >
+                  Limite
+                </label>
+                <Input
+                  id="ingest-limit"
+                  value={limitInput}
+                  onChange={(event) => setLimitInput(event.target.value)}
+                  inputMode="numeric"
+                  className="mt-1"
+                />
+              </div>
+            </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-border p-4">
-          <Button type="button" variant="outline" size="sm" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button type="button" size="sm" onClick={handleIngest} disabled={pending}>
-            {pending ? "Ingestando..." : "Ingestar"}
-          </Button>
+            <div className="flex items-center justify-end gap-2 border-t border-border p-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleClose}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleIngest}
+                disabled={pending}
+              >
+                {pending ? "Ingestando..." : "Ingestar"}
+              </Button>
+            </div>
+          </div>
         </div>
       </dialog>
     </>
