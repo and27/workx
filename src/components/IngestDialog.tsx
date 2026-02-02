@@ -105,7 +105,7 @@ export default function IngestDialog() {
 
       <dialog
         ref={dialogRef}
-        className="w-full max-w-md rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/40"
+        className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/40"
         onCancel={(event) => {
           event.preventDefault();
           handleClose();
