@@ -4,7 +4,7 @@ Workx is a single-user job search execution system: it helps you decide what to 
 
 It is built with a Ports & Adapters architecture. By default it runs in **memory mode** (seeded data). When Supabase env vars are present, it uses **Supabase persistence**.
 
-Job discovery foundations are implemented via a manual ingestion flow (Remotive source) and a jobs list with filters. Automated scraping and ranking are future phases (see `ROADMAP.md`).
+Job discovery foundations are implemented via a manual ingestion flow (Remotive + WWR + Web3 sources) and a jobs list with filters. Automated scraping and ranking are future phases (see `ROADMAP.md`).
 
 ## Daily Decision Loop
 
@@ -40,6 +40,12 @@ NEXT_PUBLIC_SUPABASE_URL=your_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_key
 ```
 
+If you want to ingest Web3 jobs, set:
+
+```bash
+WEB3_CAREER_TOKEN=your_web3_token
+```
+
 Apply the schema in `supabase/schema.sql` to your Supabase project.
 
 ```bash
@@ -48,15 +54,40 @@ npm run dev
 
 Open http://localhost:3000
 
-## Manual Job Ingestion (Remotive)
+## Manual Job Ingestion (Remotive + WWR + Web3)
 
 With the dev server running, you can trigger manual ingestion from Remotive:
 
 ```bash
-curl "http://localhost:3000/api/ingest/remotive?limit=50"
+curl "http://localhost:3000/api/ingest?source=Remotive&limit=50"
+```
+
+Or ingest from We Work Remotely:
+
+```bash
+curl "http://localhost:3000/api/ingest?source=WWR&limit=50"
+```
+
+Or ingest from Web3:
+
+```bash
+curl "http://localhost:3000/api/ingest?source=Web3&limit=50"
+```
+
+To ingest from all configured sources at once:
+
+```bash
+curl "http://localhost:3000/api/ingest?source=all&limit=50"
 ```
 
 This will upsert jobs by `externalId` and make them available in the Jobs page.
+
+Legacy endpoints still work:
+
+```bash
+curl "http://localhost:3000/api/ingest/remotive?limit=50"
+curl "http://localhost:3000/api/ingest/wwr?limit=50"
+```
 
 ## Scripts
 

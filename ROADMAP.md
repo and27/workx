@@ -57,8 +57,8 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 **Delivers:**
 
-- Manual job ingestion (Remotive source).
-- API trigger for ingestion.
+- Manual job ingestion (Remotive + WWR + Web3 sources).
+- API trigger for ingestion (generic `/api/ingest` + source-specific routes).
 - Jobs list in UI.
 - “Top matches today” (flat list, no ranking).
 - Deduplication via `(source, externalId)` upsert.
@@ -118,6 +118,14 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
   - Reasons and dealbreakers
 - Default view surfaces only “Selected for you”.
 - Lightweight scoring (heuristic, not ML-heavy).
+
+**Status update (2026-02-02):**
+- ✅ User profile is defined in composition.
+- ✅ Job triage fields persist on Job (status/reasons/provider/triagedAt).
+- ✅ Coarse triage via Ollama with confidence gating.
+- ✅ Jobs UI defaults to shortlist-first + triage badge; reasons live in job detail modal.
+- 🟡 OpenAI disambiguation exists but lacks structured schema + daily caps.
+- ⏳ Versioned re-triage on profile changes not implemented yet.
 
 **Non-goals:**
 
