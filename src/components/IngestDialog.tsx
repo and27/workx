@@ -110,11 +110,6 @@ export default function IngestDialog() {
           event.preventDefault();
           handleClose();
         }}
-        onClick={(event) => {
-          if (event.target === dialogRef.current) {
-            handleClose();
-          }
-        }}
       >
         <div className="flex items-start justify-between gap-4 border-b border-border p-4">
           <div className="space-y-1">
@@ -137,7 +132,7 @@ export default function IngestDialog() {
               <SelectTrigger id="ingest-source" className="mt-1 w-full">
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent portalContainer={dialogRef.current}>
                 <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="Remotive">Remotive</SelectItem>
                 <SelectItem value="WWR">WWR</SelectItem>
