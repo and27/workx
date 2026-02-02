@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,7 +10,22 @@ type triageMode = "new" | "recent";
 export default function TriageControls() {
   const router = useRouter();
   const { toast } = useToast();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const [open, setOpen] = useState(false);
   const [pendingMode, setPendingMode] = useState<triageMode | null>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) {
+      dialog.showModal();
+    }
+    if (!open && dialog.open) {
+      dialog.close();
+    }
+  }, [open]);
+
+  const handleClose = () => setOpen(false);
 
   const runTriage = async (mode: triageMode) => {
     if (pendingMode) return;
@@ -42,6 +57,7 @@ export default function TriageControls() {
             : undefined,
         variant: "success",
       });
+      handleClose();
       router.refresh();
     } catch (error) {
       toast({
@@ -57,27 +73,64 @@ export default function TriageControls() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={pendingMode !== null}
-        onClick={() => runTriage("new")}
-      >
-        {pendingMode === "new" ? "Analizando..." : "Analizar nuevos"}
+    <>
+      <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
+        Clasificar
       </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={pendingMode !== null}
-        onClick={() => runTriage("recent")}
+
+      <dialog
+        ref={dialogRef}
+        className="w-full max-w-md rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/40"
+        onCancel={(event) => {
+          event.preventDefault();
+          handleClose();
+        }}
+        onClick={(event) => {
+          if (event.target === dialogRef.current) {
+            handleClose();
+          }
+        }}
       >
-        {pendingMode === "recent"
-          ? "Analizando..."
-          : "Re-analizar recientes"}
-      </Button>
-    </div>
+        <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold">Clasificar trabajos</h2>
+            <p className="text-xs text-muted-foreground">
+              Corre el triage para nuevos trabajos o re-analiza recientes.
+            </p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={handleClose}>
+            Cerrar
+          </Button>
+        </div>
+
+        <div className="space-y-3 p-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-between"
+            disabled={pendingMode !== null}
+            onClick={() => runTriage("new")}
+          >
+            <span>Analizar nuevos</span>
+            <span className="text-xs text-muted-foreground">Solo sin triage</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-between"
+            disabled={pendingMode !== null}
+            onClick={() => runTriage("recent")}
+          >
+            <span>Re-analizar recientes</span>
+            <span className="text-xs text-muted-foreground">Ultimos 14 dias</span>
+          </Button>
+          {pendingMode && (
+            <p className="text-xs text-muted-foreground">
+              Analizando {pendingMode === "new" ? "nuevos" : "recientes"}...
+            </p>
+          )}
+        </div>
+      </dialog>
+    </>
   );
 }
