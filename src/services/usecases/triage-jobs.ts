@@ -100,10 +100,19 @@ export const createTriageJobsUseCase =
     const openAiEnabled = hasOpenAiConfig();
 
     for (const jobRecord of candidates) {
-      const coarse = await dependencies.jobTriage.coarse({
-        job: jobRecord,
-        profile: dependencies.profile,
-      });
+      let coarse: Awaited<ReturnType<jobTriagePort["coarse"]>>;
+      try {
+        coarse = await dependencies.jobTriage.coarse({
+          job: jobRecord,
+          profile: dependencies.profile,
+        });
+      } catch (error) {
+        return err(
+          error instanceof Error
+            ? error
+            : new Error("Ollama no está disponible.")
+        );
+      }
       if (!coarse) {
         skipped += 1;
         continue;

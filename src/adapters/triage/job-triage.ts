@@ -221,8 +221,11 @@ const fetchOllama = async (
     return null;
   }
 
+  const url = `${baseUrl.replace(/\/$/, "")}/api/generate`;
+  let response: Response;
+
   try {
-    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/generate`, {
+    response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -231,19 +234,21 @@ const fetchOllama = async (
         stream: false,
       }),
     });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = (await response.json()) as { response?: string };
-    const payload = data.response
-      ? (parseJsonText(data.response) as triagePayload | null)
-      : null;
-    return toDecision(payload, "ollama");
   } catch {
-    return null;
+    throw new Error("Ollama no está disponible.");
   }
+
+  if (!response.ok) {
+    throw new Error("Ollama no está disponible.");
+  }
+
+  const data = (await response.json().catch(() => null)) as
+    | { response?: string }
+    | null;
+  if (!data?.response) return null;
+
+  const payload = parseJsonText(data.response) as triagePayload | null;
+  return toDecision(payload, "ollama");
 };
 
 const fetchOpenAI = async (
