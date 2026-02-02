@@ -110,11 +110,6 @@ export default function IngestDialog() {
           event.preventDefault();
           handleClose();
         }}
-        onClick={(event) => {
-          if (event.target === dialogRef.current) {
-            handleClose();
-          }
-        }}
       >
         <div className="flex items-start justify-between gap-4 border-b border-border p-4">
           <div className="space-y-1">
