@@ -32,6 +32,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
   const source = rawSource && rawSource !== "all" ? rawSource : undefined;
   const seniority =
     rawSeniority && rawSeniority !== "all" ? rawSeniority : undefined;
+  const needsRetriage = rawTriage === "retriage" ? true : undefined;
   const triageStatus =
     rawTriage === "shortlist" ||
     rawTriage === "maybe" ||
@@ -44,6 +45,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     source,
     seniority,
     triageStatus,
+    needsRetriage,
   });
   const allJobs = await listJobs();
   const applications = await listApplications();
@@ -132,6 +134,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
                   <SelectItem value="shortlist">Seleccionados</SelectItem>
                   <SelectItem value="maybe">Quizas</SelectItem>
                   <SelectItem value="reject">Rechazados</SelectItem>
+                  <SelectItem value="retriage">Re-analizar</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -138,6 +138,7 @@ export const createTriageJobsUseCase =
             triageReasons: finalDecision.reasons,
             triagedAt,
             triageProvider: finalDecision.provider,
+            triageVersion: dependencies.profile.profileVersion,
           },
         });
         triaged += 1;

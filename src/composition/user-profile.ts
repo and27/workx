@@ -1,6 +1,7 @@
 import { userProfile } from "@/src/domain/entities/user-profile";
 
 export const defaultUserProfile: userProfile = {
+  profileVersion: 1,
   // Si falta alguno de estos, normalmente no vale la pena leer a fondo el JD.
   mustHaveKeywords: ["react", "typescript", "javascript", "frontend", "web"],
 

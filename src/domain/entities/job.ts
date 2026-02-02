@@ -17,6 +17,8 @@ export type job = {
   triageReasons: string[] | null;
   triagedAt: isoDateTime | null;
   triageProvider: triageProvider | null;
+  triageVersion: number | null;
+  needsRetriage?: boolean;
   publishedAt: isoDateTime | null;
   createdAt: isoDateTime;
   updatedAt: isoDateTime;

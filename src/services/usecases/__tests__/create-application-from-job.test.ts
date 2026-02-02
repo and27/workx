@@ -23,6 +23,7 @@ const makeJob = (overrides: Partial<job>): job => ({
   triageReasons: null,
   triagedAt: null,
   triageProvider: null,
+  triageVersion: null,
   publishedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
