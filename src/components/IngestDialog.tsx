@@ -141,7 +141,6 @@ export default function IngestDialog() {
                 <Select
                   value={source}
                   onValueChange={(value) => setSource(value as ingestSource)}
-                  modal={false}
                 >
                   <SelectTrigger id="ingest-source" className="mt-1 w-full">
                     <SelectValue placeholder="Todas" />
