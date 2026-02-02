@@ -70,6 +70,7 @@ export default function JobTable({
       <Table>
         <TableHeader className="bg-muted/50">
           <TableRow>
+            <TableHead>Acción</TableHead>
             <TableHead>Rol</TableHead>
             <TableHead>Empresa</TableHead>
             {variant === "list" && (
@@ -78,7 +79,6 @@ export default function JobTable({
               </>
             )}
             <TableHead>Publicado</TableHead>
-            <TableHead>Accion</TableHead>
             {variant === "list" && <TableHead>Fuente</TableHead>}
             {variant === "home" && <TableHead>Fuente</TableHead>}
             {variant === "list" && <TableHead>Tags</TableHead>}
@@ -99,10 +99,17 @@ export default function JobTable({
                 }
               }}
             >
-              <TableCell className="font-medium">
+              <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
+                <JobSaveForm
+                  jobId={job.id}
+                  saved={savedSet.has(job.id)}
+                  action={action}
+                />
+              </TableCell>
+              <TableCell className="font-medium max-w-xs overflow-hidden">
                 <div className="space-y-0">
                   {triageLabel(job.triageStatus) && (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
                       {job.needsRetriage && (
                         <Badge
                           variant="outline"
@@ -130,13 +137,13 @@ export default function JobTable({
                     </div>
                   )}
                   <div className="space-y-1 pl-1">
-                    <div>
+                    <div className="truncate">
                       {variant === "list" && job.sourceUrl ? (
                         <a
                           href={job.sourceUrl}
                           target="_blank"
                           rel="noopener"
-                          className="underline-offset-4 hover:underline"
+                          className="underline-offset-4 hover:underline truncate"
                           onClick={stopRowClick}
                           onKeyDown={stopRowClick}
                         >
@@ -149,7 +156,7 @@ export default function JobTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="max-w-sm">
+              <TableCell className="max-w-40">
                 <div className="space-y-1">
                   <div className="font-medium">{job.company}</div>
                   <div className="text-xs text-muted-foreground truncate">
@@ -166,13 +173,6 @@ export default function JobTable({
               )}
               <TableCell className="text-muted-foreground">
                 {formatRelativeDate(job.publishedAt)}
-              </TableCell>
-              <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
-                <JobSaveForm
-                  jobId={job.id}
-                  saved={savedSet.has(job.id)}
-                  action={action}
-                />
               </TableCell>
               {variant === "list" && (
                 <TableCell className="text-muted-foreground">
