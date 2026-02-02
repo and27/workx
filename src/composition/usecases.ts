@@ -25,6 +25,7 @@ async function buildUseCases() {
     }),
     listJobs: createListJobsUseCase({
       jobRepository: repositories.jobRepository,
+      profile: defaultUserProfile,
     }),
     ingestJobs: createIngestJobsUseCase({
       jobSource: repositories.jobSource,

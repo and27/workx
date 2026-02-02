@@ -72,6 +72,7 @@ const applyUpsert = (
     triageReasons: null,
     triagedAt: null,
     triageProvider: null,
+    triageVersion: null,
     publishedAt: record.publishedAt,
     createdAt: now,
     updatedAt: now,
@@ -130,6 +131,7 @@ export const createMemoryJobRepository = (
       triageReasons: input.patch.triageReasons,
       triagedAt: input.patch.triagedAt,
       triageProvider: input.patch.triageProvider,
+      triageVersion: input.patch.triageVersion,
     };
     store.jobs[index] = updated;
     return updated;

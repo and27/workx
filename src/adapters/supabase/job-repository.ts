@@ -23,6 +23,7 @@ type jobRow = {
   triage_reasons: string[] | null;
   triaged_at: string | null;
   triage_provider: string | null;
+  triage_version: number | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -43,6 +44,7 @@ const toJob = (row: jobRow): job => ({
   triageReasons: row.triage_reasons ?? null,
   triagedAt: row.triaged_at ?? null,
   triageProvider: row.triage_provider ?? null,
+  triageVersion: row.triage_version ?? null,
   publishedAt: row.published_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -190,6 +192,7 @@ export const createSupabaseJobRepository = (): jobRepository => ({
         triage_reasons: input.patch.triageReasons,
         triaged_at: input.patch.triagedAt,
         triage_provider: input.patch.triageProvider,
+        triage_version: input.patch.triageVersion,
         updated_at: input.patch.triagedAt ?? new Date().toISOString(),
       })
       .eq("id", input.id)

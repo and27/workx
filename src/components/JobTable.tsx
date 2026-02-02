@@ -45,6 +45,8 @@ const triageBadgeClass = (status: job["triageStatus"]) => {
   return "";
 };
 
+const retriageBadgeClass = "border-amber-400 text-amber-600";
+
 export default function JobTable({
   jobs,
   savedJobIds,
@@ -101,11 +103,29 @@ export default function JobTable({
                 <div className="space-y-0">
                   {triageLabel(job.triageStatus) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      {job.needsRetriage && (
+                        <Badge
+                          variant="outline"
+                          className={`${retriageBadgeClass} px-2`}
+                        >
+                          Re-analizar
+                        </Badge>
+                      )}
                       <Badge
                         variant="outline"
                         className={`${triageBadgeClass(job.triageStatus)} px-2`}
                       >
                         {triageLabel(job.triageStatus)}
+                      </Badge>
+                    </div>
+                  )}
+                  {!triageLabel(job.triageStatus) && job.needsRetriage && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <Badge
+                        variant="outline"
+                        className={`${retriageBadgeClass} px-2`}
+                      >
+                        Re-analizar
                       </Badge>
                     </div>
                   )}
