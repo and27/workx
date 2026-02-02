@@ -146,6 +146,8 @@ A PR is "done" only when:
 - `main` is release-only; merge `dev` → `main` when cutting a version.
 - Use the PR template in `.github/pull_request_template.md`.
 - PR body format must include **Summary** and **Testing** sections.
+- Always set PR body via `gh pr create/edit --body-file` using a PowerShell here-string:
+  - `@'` ... ` '@` (ensures correct markdown formatting).
 - If a PR closes an issue, include `Closes #NN` in the PR body.
 - When adding DB fields, update both `supabase/schema.sql` and add a migration in `supabase/migrations/`.
 
