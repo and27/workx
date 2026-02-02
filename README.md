@@ -4,7 +4,7 @@ Workx is a single-user job search execution system: it helps you decide what to 
 
 It is built with a Ports & Adapters architecture. By default it runs in **memory mode** (seeded data). When Supabase env vars are present, it uses **Supabase persistence**.
 
-Job discovery foundations are implemented via a manual ingestion flow (Remotive + WWR + Web3 sources) and a jobs list with filters. Automated scraping and ranking are future phases (see `ROADMAP.md`).
+Job discovery foundations are implemented via a manual ingestion flow (Remotive + WWR + Web3 + Remote OK sources) and a jobs list with filters. Automated scraping and ranking are future phases (see `ROADMAP.md`).
 
 ## Daily Decision Loop
 
@@ -54,7 +54,7 @@ npm run dev
 
 Open http://localhost:3000
 
-## Manual Job Ingestion (Remotive + WWR + Web3)
+## Manual Job Ingestion (Remotive + WWR + Web3 + Remote OK)
 
 With the dev server running, you can trigger manual ingestion from Remotive:
 
@@ -73,6 +73,14 @@ Or ingest from Web3:
 ```bash
 curl "http://localhost:3000/api/ingest?source=Web3&limit=50"
 ```
+
+Or ingest from Remote OK:
+
+```bash
+curl "http://localhost:3000/api/ingest?source=Remote%20OK&limit=50"
+```
+
+Remote OK requests attribution and direct job links; keep the source label and URL intact.
 
 To ingest from all configured sources at once:
 

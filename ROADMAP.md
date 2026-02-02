@@ -73,7 +73,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
-## Phase 2.2 – Multi-source Job Discovery (Epic 4) 🟡 In Progress
+## Phase 2.2 – Multi-source Job Discovery (Epic 4) ✅ Complete
 
 **Goal:** Expand manual ingestion to multiple sources without UI changes.
 
@@ -87,8 +87,8 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 **Status update (2026-02-02):**
 - ✅ WWR adapter
 - ✅ Web3 adapter
+- ✅ Remote OK adapter
 - ✅ Multi-source router + generic ingest endpoint
-- ⏳ Remote OK adapter (pending)
 
 **Non-goals:**
 
