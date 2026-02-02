@@ -128,7 +128,11 @@ export default function IngestDialog() {
             <label className="text-xs text-muted-foreground" htmlFor="ingest-source">
               Fuente
             </label>
-            <Select value={source} onValueChange={(value) => setSource(value as ingestSource)}>
+            <Select
+              value={source}
+              onValueChange={(value) => setSource(value as ingestSource)}
+              modal={false}
+            >
               <SelectTrigger id="ingest-source" className="mt-1 w-full">
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
