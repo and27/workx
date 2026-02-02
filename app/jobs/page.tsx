@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
+import IngestControls from "@/src/components/IngestControls";
 import JobTable from "@/src/components/JobTable";
 import TriageControls from "@/app/jobs/TriageControls";
 
@@ -147,7 +148,10 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
               </Button>
             </div>
           </form>
-          <TriageControls />
+          <div className="flex flex-wrap items-end gap-3">
+            <IngestControls />
+            <TriageControls />
+          </div>
         </div>
 
         <JobTable
