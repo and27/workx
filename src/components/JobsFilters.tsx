@@ -58,6 +58,10 @@ export default function JobsFilters({
 
   useEffect(() => {
     const trimmed = search.trim();
+    const currentQuery = searchParams.get("q") ?? "";
+    if (trimmed === currentQuery) {
+      return;
+    }
     const timeout = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (!trimmed) {
