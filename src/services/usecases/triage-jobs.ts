@@ -17,6 +17,8 @@ export type triageJobsOutput = {
   processed: number;
   triaged: number;
   skipped: number;
+  openaiUsed: number;
+  openaiSkippedCap: number;
 };
 
 export type triageJobsDeps = {
@@ -24,6 +26,34 @@ export type triageJobsDeps = {
   jobTriage: jobTriagePort;
   profile: userProfile;
 };
+
+type openAiUsageState = {
+  dateKey: string;
+  used: number;
+};
+
+const openAiUsage: openAiUsageState = { dateKey: "", used: 0 };
+
+const toDateKey = (date = new Date()) => date.toISOString().slice(0, 10);
+
+const getOpenAiDailyCap = () => {
+  const raw = process.env.OPENAI_DAILY_CAP?.trim();
+  const parsed = raw ? Number(raw) : 10;
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.max(0, Math.floor(parsed));
+};
+
+const getOpenAiUsage = () => {
+  const today = toDateKey();
+  if (openAiUsage.dateKey !== today) {
+    openAiUsage.dateKey = today;
+    openAiUsage.used = 0;
+  }
+  return openAiUsage;
+};
+
+const hasOpenAiConfig = () =>
+  Boolean(process.env.OPENAI_API_KEY?.trim() && process.env.OPENAI_MODEL?.trim());
 
 const isRecent = (jobRecord: job, days: number) => {
   const reference =
@@ -59,6 +89,10 @@ export const createTriageJobsUseCase =
 
     let triaged = 0;
     let skipped = 0;
+    let openaiUsed = 0;
+    let openaiSkippedCap = 0;
+    const openAiCap = getOpenAiDailyCap();
+    const openAiEnabled = hasOpenAiConfig();
 
     for (const jobRecord of candidates) {
       const coarse = await dependencies.jobTriage.coarse({
@@ -72,13 +106,26 @@ export const createTriageJobsUseCase =
 
       let finalDecision = coarse;
       if (coarse.status === "maybe") {
-        const disambiguated = await dependencies.jobTriage.disambiguate({
-          job: jobRecord,
-          profile: dependencies.profile,
-          previous: coarse,
-        });
-        if (disambiguated) {
-          finalDecision = disambiguated;
+        if (!openAiEnabled) {
+          // OpenAI not configured; keep coarse decision.
+        } else if (openAiCap <= 0) {
+          openaiSkippedCap += 1;
+        } else {
+          const usage = getOpenAiUsage();
+          if (usage.used >= openAiCap) {
+            openaiSkippedCap += 1;
+          } else {
+            usage.used += 1;
+            openaiUsed += 1;
+            const disambiguated = await dependencies.jobTriage.disambiguate({
+              job: jobRecord,
+              profile: dependencies.profile,
+              previous: coarse,
+            });
+            if (disambiguated) {
+              finalDecision = disambiguated;
+            }
+          }
         }
       }
 
@@ -105,5 +152,7 @@ export const createTriageJobsUseCase =
       processed: candidates.length,
       triaged,
       skipped,
+      openaiUsed,
+      openaiSkippedCap,
     });
   };
