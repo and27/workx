@@ -25,6 +25,7 @@ export type triageJobsDeps = {
   jobRepository: jobRepository;
   jobTriage: jobTriagePort;
   profile: userProfile;
+  ollamaConfigured: boolean;
 };
 
 type openAiUsageState = {
@@ -77,6 +78,10 @@ export const createTriageJobsUseCase =
     const mode = input.mode === "recent" ? "recent" : "new";
     const days = input.days && input.days > 0 ? input.days : 14;
 
+    if (!dependencies.ollamaConfigured) {
+      return err(new Error("Configura Ollama para analizar trabajos."));
+    }
+
     const items =
       mode === "new"
         ? await dependencies.jobRepository.list({ triageStatus: "untriaged" })
@@ -95,10 +100,19 @@ export const createTriageJobsUseCase =
     const openAiEnabled = hasOpenAiConfig();
 
     for (const jobRecord of candidates) {
-      const coarse = await dependencies.jobTriage.coarse({
-        job: jobRecord,
-        profile: dependencies.profile,
-      });
+      let coarse: Awaited<ReturnType<jobTriagePort["coarse"]>>;
+      try {
+        coarse = await dependencies.jobTriage.coarse({
+          job: jobRecord,
+          profile: dependencies.profile,
+        });
+      } catch (error) {
+        return err(
+          error instanceof Error
+            ? error
+            : new Error("Ollama no está disponible.")
+        );
+      }
       if (!coarse) {
         skipped += 1;
         continue;
