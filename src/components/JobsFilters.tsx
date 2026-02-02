@@ -43,9 +43,10 @@ export default function JobsFilters({
       params.set(key, value);
     }
     const query = params.toString();
-    router.replace(`${pathname}${query ? `?${query}` : ""}`, {
-      scroll: false,
-    });
+    if (query === searchParams.toString()) {
+      return;
+    }
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   useEffect(() => {
@@ -58,6 +59,9 @@ export default function JobsFilters({
         params.set("q", trimmed);
       }
       const query = params.toString();
+      if (query === searchParams.toString()) {
+        return;
+      }
       router.replace(`${pathname}${query ? `?${query}` : ""}`, {
         scroll: false,
       });
