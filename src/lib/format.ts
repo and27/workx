@@ -25,7 +25,7 @@ export const formatRelativeDate = (
   const minutes = totalMinutes % 60;
 
   if (days > 0) {
-    return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+    return `${days}d`;
   }
   if (totalHours > 0) {
     return `${totalHours}h`;
