@@ -37,11 +37,10 @@ export default async function ApplicationDetailPage({
     notFound();
   }
 
-  const job = application.jobId
-    ? await getJob({ id: application.jobId })
-    : null;
-
-  const logs = await listApplicationLogs({ applicationId: application.id });
+  const [job, logs] = await Promise.all([
+    application.jobId ? getJob({ id: application.jobId }) : Promise.resolve(null),
+    listApplicationLogs({ applicationId: application.id }),
+  ]);
 
   return (
     <div className="space-y-6">
