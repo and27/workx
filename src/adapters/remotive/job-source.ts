@@ -1,4 +1,8 @@
 import { jobSource, jobSourceRecord } from "@/src/ports/job-source";
+import {
+  normalizeSeniority,
+  toPublishedAt,
+} from "@/src/adapters/job-source-helpers";
 
 type remotiveJob = {
   id: number;
@@ -30,35 +34,6 @@ const shouldInclude = (record: jobSourceRecord) => {
     return false;
   }
   return includeKeywords.some((keyword) => haystack.includes(keyword));
-};
-
-const normalizeSeniority = (title: string) => {
-  const normalized = title.toLowerCase();
-  if (normalized.includes("intern")) {
-    return "Intern";
-  }
-  if (normalized.includes("junior") || normalized.includes("jr")) {
-    return "Junior";
-  }
-  if (normalized.includes("senior") || normalized.includes("sr")) {
-    return "Senior";
-  }
-  if (
-    normalized.includes("staff") ||
-    normalized.includes("principal") ||
-    normalized.includes("lead")
-  ) {
-    return "Lead";
-  }
-  return "Mid";
-};
-
-const toPublishedAt = (value: string) => {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
-  return parsed.toISOString();
 };
 
 const toSourceRecord = (job: remotiveJob): jobSourceRecord => ({
