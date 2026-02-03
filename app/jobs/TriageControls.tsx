@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { emitTriageStatus } from "@/src/lib/triage-status";
 
 type triageMode = "new" | "recent";
 
@@ -30,6 +31,7 @@ export default function TriageControls() {
   const runTriage = async (mode: triageMode) => {
     if (pendingMode) return;
     setPendingMode(mode);
+    emitTriageStatus(true);
     try {
       const response = await fetch("/api/triage/jobs", {
         method: "POST",
@@ -77,6 +79,7 @@ export default function TriageControls() {
       });
     } finally {
       setPendingMode(null);
+      emitTriageStatus(false);
     }
   };
 

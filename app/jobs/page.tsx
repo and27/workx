@@ -4,6 +4,7 @@ import IngestDialog from "@/src/components/IngestDialog";
 import JobsFilters from "@/src/components/JobsFilters";
 import JobTable from "@/src/components/JobTable";
 import JobsPagination from "@/src/components/JobsPagination";
+import JobsTriageStatus from "@/src/components/JobsTriageStatus";
 import TriageControls from "@/app/jobs/TriageControls";
 
 type jobsPageProps = {
@@ -92,6 +93,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
             initialSource={rawSource ?? "all"}
             initialTriage={triageValue}
           />
+          <JobsTriageStatus />
         </div>
 
         <JobTable
