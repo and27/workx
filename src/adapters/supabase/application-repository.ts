@@ -77,6 +77,9 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
     if (query.priority) {
       builder = builder.eq("priority", query.priority);
     }
+    if (query.updatedAfter) {
+      builder = builder.gte("updated_at", query.updatedAfter);
+    }
 
     const { data, error } = await builder;
     if (error) {

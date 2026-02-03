@@ -8,6 +8,7 @@ export type listApplicationsQuery = {
   search?: string;
   status?: applicationStatus;
   priority?: priority;
+  updatedAfter?: isoDateTime;
 };
 
 export type applicationUpdatePatch = {

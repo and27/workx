@@ -70,14 +70,19 @@ export default async function Home() {
             </CardContent>
           </Card>
         </Link>
-        <Card className="py-4">
-          <CardContent className="space-y-1">
-            <p className="text-xs text-muted-foreground">
-              Postulaciones esta semana
-            </p>
-            <p className="text-2xl font-semibold">{thisWeek}</p>
-          </CardContent>
-        </Card>
+        <Link
+          href="/applications?recent=week"
+          className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Card className="py-4">
+            <CardContent className="space-y-1">
+              <p className="text-xs text-muted-foreground">
+                Postulaciones esta semana
+              </p>
+              <p className="text-2xl font-semibold">{thisWeek}</p>
+            </CardContent>
+          </Card>
+        </Link>
       </section>
 
       <section className="space-y-3">

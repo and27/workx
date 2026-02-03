@@ -19,6 +19,7 @@ export const createMemoryApplicationRepository = (
 ): applicationRepository => ({
   async list(query: listApplicationsQuery) {
     const search = query.search?.trim();
+    const updatedAfter = query.updatedAfter;
     return store.applications.filter((record) => {
       if (search && !matchesSearch(record, search)) {
         return false;
@@ -27,6 +28,9 @@ export const createMemoryApplicationRepository = (
         return false;
       }
       if (query.priority && record.priority !== query.priority) {
+        return false;
+      }
+      if (updatedAfter && record.updatedAt < updatedAfter) {
         return false;
       }
       return true;
