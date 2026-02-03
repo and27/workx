@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/src/lib/format";
 import { getUseCases } from "@/src/composition/usecases";
 import ApplicationJobDetail from "@/src/components/ApplicationJobDetail";
+import { saveJobAction } from "@/app/jobs/actions";
 import {
   priorityOptions,
   statusOptions,
@@ -118,7 +119,11 @@ export default async function ApplicationDetailPage({
                   {job.role} · {job.company}
                 </p>
               </div>
-              <ApplicationJobDetail job={job} saved={Boolean(application.jobId)} />
+              <ApplicationJobDetail
+                job={job}
+                saved={Boolean(application.jobId)}
+                action={saveJobAction}
+              />
             </div>
           )}
 
