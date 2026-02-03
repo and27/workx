@@ -15,6 +15,7 @@ import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
 import { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
 import { createRankShortlistUseCase } from "@/src/services/usecases/rank-shortlist";
+import { createManualJobUseCase } from "@/src/services/usecases/create-manual-job";
 import { defaultUserProfile } from "@/src/composition/user-profile";
 
 let _usecases: Awaited<ReturnType<typeof buildUseCases>> | null = null;
@@ -62,6 +63,11 @@ async function buildUseCases() {
     rankShortlist: createRankShortlistUseCase({
       jobRepository: repositories.jobRepository,
       jobRanker: repositories.jobRanker,
+      profile: defaultUserProfile,
+    }),
+    createManualJob: createManualJobUseCase({
+      jobRepository: repositories.jobRepository,
+      jobTriage: repositories.jobTriage,
       profile: defaultUserProfile,
     }),
     createApplicationFromJob: createApplicationFromJobUseCase({

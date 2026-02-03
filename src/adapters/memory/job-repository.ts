@@ -1,6 +1,7 @@
 import { job } from "@/src/domain/entities/job";
 import {
   jobRepository,
+  jobCreateRecord,
   jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
@@ -86,6 +87,39 @@ const applyUpsert = (
   return { created: true };
 };
 
+const applyCreate = (
+  store: memoryStore,
+  record: jobCreateRecord,
+  now: string
+): job => {
+  const created: job = {
+    id: createId(),
+    company: record.company,
+    role: record.role,
+    source: record.source,
+    sourceUrl: record.sourceUrl,
+    externalId: record.externalId,
+    location: record.location,
+    seniority: record.seniority,
+    tags: record.tags,
+    description: record.description,
+    triageStatus: null,
+    triageReasons: null,
+    triagedAt: null,
+    triageProvider: null,
+    triageVersion: null,
+    rankScore: null,
+    rankReason: null,
+    rankProvider: null,
+    rankVersion: null,
+    publishedAt: record.publishedAt,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.jobs.push(created);
+  return created;
+};
+
 export const createMemoryJobRepository = (
   store: memoryStore
 ): jobRepository => ({
@@ -119,6 +153,9 @@ export const createMemoryJobRepository = (
   },
   async getById(query: { id: string }) {
     return store.jobs.find((record) => record.id === query.id) ?? null;
+  },
+  async create(input: { job: jobCreateRecord; now: string }) {
+    return applyCreate(store, input.job, input.now);
   },
   async upsertByExternalId(input: { jobs: jobUpsertRecord[]; now: string }) {
     const results = input.jobs.map((record) =>

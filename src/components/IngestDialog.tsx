@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,6 +170,16 @@ export default function IngestDialog() {
                   className="mt-1"
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                ¿Quieres agregar un job manual?{" "}
+                <Link
+                  href="/manual"
+                  onClick={handleClose}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  Ir a crear job
+                </Link>
+              </p>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-border p-4">

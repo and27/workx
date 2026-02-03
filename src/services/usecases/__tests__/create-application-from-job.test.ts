@@ -56,6 +56,9 @@ describe("createApplicationFromJob", () => {
       async updateRank() {
         throw new Error("Not implemented");
       },
+      async create() {
+        throw new Error("Not implemented");
+      },
     };
 
     const applicationRepo: applicationRepository = {
