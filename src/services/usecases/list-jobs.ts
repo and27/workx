@@ -26,6 +26,9 @@ const triageRank = (value: job["triageStatus"]) => {
 const toRankScore = (value: job["rankScore"]) =>
   typeof value === "number" && Number.isFinite(value) ? value : null;
 
+const toRecency = (record: job) =>
+  record.publishedAt ?? record.updatedAt;
+
 const getNeedsRetriage = (jobRecord: job, profileVersion: number) =>
   jobRecord.triageStatus !== null &&
   jobRecord.triageVersion !== profileVersion;
@@ -59,6 +62,11 @@ export const prepareJobs = async (
         if (leftScore === null) return 1;
         if (rightScore === null) return -1;
         if (leftScore !== rightScore) return rightScore - leftScore;
+      }
+      const leftRecency = toRecency(left);
+      const rightRecency = toRecency(right);
+      if (leftRecency !== rightRecency) {
+        return rightRecency.localeCompare(leftRecency);
       }
     }
     return right.updatedAt.localeCompare(left.updatedAt);
