@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
 import {
   Table,
@@ -14,10 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import JobSaveForm from "@/app/jobs/JobSaveForm";
-import JobDetailDialog from "@/src/components/JobDetailDialog";
 import type { job } from "@/src/domain/entities/job";
 import { formatRelativeDate } from "@/src/lib/format";
 import type { saveJobState } from "@/app/jobs/actions";
+
+const LazyJobDetailDialog = lazy(() => import("@/src/components/JobDetailDialog"));
 
 type jobTableVariant = "home" | "list";
 
@@ -50,6 +52,33 @@ const triageBadgeClass = (status: job["triageStatus"]) => {
 };
 
 const retriageBadgeClass = "border-amber-400 text-amber-600";
+
+type jobDetailLoadingDialogProps = {
+  job: job;
+  onClose: () => void;
+};
+
+const JobDetailLoadingDialog = ({
+  job,
+  onClose,
+}: jobDetailLoadingDialogProps) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="w-full max-w-md rounded-lg border border-border bg-background text-foreground shadow-xl">
+      <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">{job.role}</h2>
+          <p className="text-sm text-muted-foreground">{job.company}</p>
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={onClose}>
+          Cerrar
+        </Button>
+      </div>
+      <div className="p-4 text-sm text-muted-foreground">
+        Cargando detalle...
+      </div>
+    </div>
+  </div>
+);
 
 export default function JobTable({
   jobs,
@@ -306,13 +335,24 @@ export default function JobTable({
         </TableBody>
       </Table>
 
-      <JobDetailDialog
-        job={selectedJob}
-        open={Boolean(selectedJob)}
-        saved={selectedJob ? savedSet.has(selectedJob.id) : false}
-        action={action}
-        onClose={handleClose}
-      />
+      {selectedJob && (
+        <Suspense
+          fallback={
+            <JobDetailLoadingDialog
+              job={selectedJob}
+              onClose={handleClose}
+            />
+          }
+        >
+          <LazyJobDetailDialog
+            job={selectedJob}
+            open
+            saved={savedSet.has(selectedJob.id)}
+            action={action}
+            onClose={handleClose}
+          />
+        </Suspense>
+      )}
     </>
   );
 }
