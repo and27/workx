@@ -243,6 +243,12 @@ export default function JobTable({
                           job.role
                         )}
                       </div>
+                      {isShortlist && job.rankScore !== null && (
+                        <div className="text-xs text-muted-foreground line-clamp-2">
+                          Ranking {job.rankScore}/100
+                          {job.rankReason ? ` • ${job.rankReason}` : ""}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </TableCell>
