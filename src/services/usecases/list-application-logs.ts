@@ -14,7 +14,15 @@ export const createListApplicationLogsUseCase =
     const entries = await dependencies.applicationLogRepository.listByApplicationId(
       input
     );
-    return [...entries].sort((left, right) =>
+    const sorted = [...entries].sort((left, right) =>
       right.createdAt.localeCompare(left.createdAt)
     );
+    const limit =
+      typeof input.limit === "number" && Number.isFinite(input.limit)
+        ? Math.max(0, Math.floor(input.limit))
+        : undefined;
+    if (limit === undefined) {
+      return sorted;
+    }
+    return sorted.slice(0, limit);
   };

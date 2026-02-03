@@ -6,7 +6,6 @@ import JobTable from "@/src/components/JobTable";
 import JobsPagination from "@/src/components/JobsPagination";
 import JobsTriageStatus from "@/src/components/JobsTriageStatus";
 import TriageControls from "@/app/jobs/TriageControls";
-import type { job } from "@/src/domain/entities/job";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -31,10 +30,8 @@ const parsePositiveInt = (value?: string) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 };
 
-const getSortDate = (record: job) => record.publishedAt ?? null;
-
 export default async function JobsPage({ searchParams }: jobsPageProps) {
-  const { listApplications, listJobs, listJobSources } = await getUseCases();
+  const { listApplications, listJobsPage, listJobSources } = await getUseCases();
   const params = (await searchParams) ?? {};
   const search = params.q?.trim() ?? "";
   const rawSource = params.source;
@@ -53,40 +50,27 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
       ? triageValue
       : undefined;
 
-  const [jobs, sources, applications] = await Promise.all([
-    listJobs({
-      search: search || undefined,
-      source,
-      triageStatus,
-      needsRetriage,
-    }),
-    listJobSources(),
-    listApplications(),
-  ]);
-  const sortedJobs =
-    sortKey === "publishedAt"
-      ? [...jobs].sort((left, right) => {
-          const leftDate = getSortDate(left);
-          const rightDate = getSortDate(right);
-          if (!leftDate && !rightDate) return 0;
-          if (!leftDate) return 1;
-          if (!rightDate) return -1;
-          return sortOrder === "asc"
-            ? leftDate.localeCompare(rightDate)
-            : rightDate.localeCompare(leftDate);
-        })
-      : jobs;
   const pageSize =
     requestedPageSize && PAGE_SIZE_OPTIONS.includes(requestedPageSize)
       ? requestedPageSize
       : DEFAULT_PAGE_SIZE;
-  const totalJobs = sortedJobs.length;
-  const totalPages = Math.max(1, Math.ceil(totalJobs / pageSize));
-  const currentPage = Math.min(Math.max(requestedPage ?? 1, 1), totalPages);
-  const paginatedJobs = sortedJobs.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const [pageResult, sources, applications] = await Promise.all([
+    listJobsPage({
+      search: search || undefined,
+      source,
+      triageStatus,
+      needsRetriage,
+      page: requestedPage ?? 1,
+      pageSize,
+      sort: sortKey,
+      order: sortOrder,
+    }),
+    listJobSources(),
+    listApplications(),
+  ]);
+  const { items, total, page } = pageResult;
+  const totalJobs = total;
+  const currentPage = page;
   const savedJobIds = applications
     .map((application) => application.jobId)
     .filter((jobId): jobId is string => Boolean(jobId));
@@ -119,7 +103,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
         </div>
 
         <JobTable
-          jobs={paginatedJobs}
+          jobs={items}
           savedJobIds={savedJobIds}
           action={saveJobAction}
           variant="list"
