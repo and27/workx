@@ -115,9 +115,10 @@ export default function JobTable({
               </TableCell>
               <TableCell className="font-medium max-w-xs overflow-hidden">
                 <div className="space-y-0">
-                  {(job.needsRetriage || (triageInfo && !isShortlist)) && (
+                  {((job.needsRetriage && !isShortlist) ||
+                    (triageInfo && !isShortlist)) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
-                      {job.needsRetriage && (
+                      {job.needsRetriage && !isShortlist && (
                         <Badge
                           variant="outline"
                           className={`${retriageBadgeClass} px-2`}
@@ -153,12 +154,23 @@ export default function JobTable({
                   <div className="space-y-1 pl-1">
                     <div className="flex items-center gap-2 truncate">
                       {isShortlist && TriageIcon && (
-                        <span
-                          className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${triageBadgeClass(job.triageStatus)}`}
-                          title={triageInfo?.label}
-                        >
-                          <TriageIcon className="size-3" />
-                          <span className="sr-only">{triageInfo?.label}</span>
+                        <span className="inline-flex items-center gap-1">
+                          <span
+                            className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${triageBadgeClass(job.triageStatus)}`}
+                            title={triageInfo?.label}
+                          >
+                            <TriageIcon className="size-3" />
+                            <span className="sr-only">{triageInfo?.label}</span>
+                          </span>
+                          {job.needsRetriage && (
+                            <span
+                              className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${retriageBadgeClass}`}
+                              title="Re-analizar"
+                            >
+                              <RefreshCw className="size-3" />
+                              <span className="sr-only">Re-analizar</span>
+                            </span>
+                          )}
                         </span>
                       )}
                       {variant === "list" && job.sourceUrl ? (
