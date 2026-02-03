@@ -83,7 +83,9 @@ export const reducer = (state: toastState, action: action): toastState => {
         addToRemoveQueue(toastId);
       } else {
         state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
+          if (toast.id) {
+            addToRemoveQueue(toast.id);
+          }
         });
       }
 
