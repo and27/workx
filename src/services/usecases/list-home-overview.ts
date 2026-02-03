@@ -11,6 +11,15 @@ export type homeOverview = {
 };
 
 const ACTIVE_INTERVIEW_STATUSES: applicationStatus[] = ["screen", "tech"];
+const NON_ARCHIVED_STATUSES: applicationStatus[] = [
+  "saved",
+  "applied",
+  "screen",
+  "tech",
+  "offer",
+  "rejected",
+  "ghosted",
+];
 
 const subtractDays = (base: Date, days: number) =>
   new Date(base.getTime() - days * 24 * 60 * 60 * 1000);
@@ -26,7 +35,10 @@ export const createListHomeOverviewUseCase =
         dependencies.applicationRepository.count({
           statusIn: ACTIVE_INTERVIEW_STATUSES,
         }),
-        dependencies.applicationRepository.count({ overdueDate: today }),
+        dependencies.applicationRepository.count({
+          overdueDate: today,
+          statusIn: NON_ARCHIVED_STATUSES,
+        }),
         dependencies.applicationRepository.count({ updatedAfter: weekAgo }),
         dependencies.applicationRepository.getLatestId(),
       ]);
