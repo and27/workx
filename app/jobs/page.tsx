@@ -53,12 +53,16 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
       ? triageValue
       : undefined;
 
-  const jobs = await listJobs({
-    search: search || undefined,
-    source,
-    triageStatus,
-    needsRetriage,
-  });
+  const [jobs, allJobs, applications] = await Promise.all([
+    listJobs({
+      search: search || undefined,
+      source,
+      triageStatus,
+      needsRetriage,
+    }),
+    listJobs(),
+    listApplications(),
+  ]);
   const sortedJobs =
     sortKey === "publishedAt"
       ? [...jobs].sort((left, right) => {
@@ -83,8 +87,6 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  const allJobs = await listJobs();
-  const applications = await listApplications();
   const savedJobIds = applications
     .map((application) => application.jobId)
     .filter((jobId): jobId is string => Boolean(jobId));

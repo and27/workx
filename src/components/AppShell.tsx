@@ -35,7 +35,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
                   href={item.href}
                   className={cn(
                     "rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted",
-                    isActive && "bg-muted font-medium"
+                    isActive && "border border-border shadow-sm font-medium",
                   )}
                 >
                   {item.label}

@@ -9,8 +9,11 @@ import JobTable from "@/src/components/JobTable";
 export default async function Home() {
   const { listInbox, listApplications, listJobs, listApplicationLogs } =
     await getUseCases();
-  const { overdue } = await listInbox();
-  const applications = await listApplications();
+  const [{ overdue }, applications, jobs] = await Promise.all([
+    listInbox(),
+    listApplications(),
+    listJobs(),
+  ]);
   const totalApplications = applications.length;
   const activeInterviews = applications.filter(
     (item) => item.status === "screen" || item.status === "tech"
@@ -28,7 +31,6 @@ export default async function Home() {
     return diffDays <= 7;
   }).length;
 
-  const jobs = await listJobs();
   const savedJobIds = applications
     .map((application) => application.jobId)
     .filter((jobId): jobId is string => Boolean(jobId));
