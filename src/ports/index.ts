@@ -14,6 +14,8 @@ export type {
   jobUpsertRecord,
   jobUpsertResult,
   listJobsQuery,
+  listJobsPageQuery,
+  listJobsPageResult,
 } from "@/src/ports/job-repository";
 export type {
   jobSource,
