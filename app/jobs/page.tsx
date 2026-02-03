@@ -6,6 +6,7 @@ import JobTable from "@/src/components/JobTable";
 import JobsPagination from "@/src/components/JobsPagination";
 import JobsTriageStatus from "@/src/components/JobsTriageStatus";
 import TriageControls from "@/app/jobs/TriageControls";
+import type { job } from "@/src/domain/entities/job";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -14,6 +15,8 @@ type jobsPageProps = {
     triage?: string;
     page?: string;
     pageSize?: string;
+    sort?: string;
+    order?: string;
   }>;
 };
 
@@ -28,6 +31,8 @@ const parsePositiveInt = (value?: string) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 };
 
+const getSortDate = (record: job) => record.publishedAt ?? null;
+
 export default async function JobsPage({ searchParams }: jobsPageProps) {
   const { listApplications, listJobs } = await getUseCases();
   const params = (await searchParams) ?? {};
@@ -36,6 +41,8 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
   const rawTriage = params.triage;
   const requestedPage = parsePositiveInt(params.page);
   const requestedPageSize = parsePositiveInt(params.pageSize);
+  const sortKey = params.sort === "publishedAt" ? "publishedAt" : undefined;
+  const sortOrder = params.order === "asc" ? "asc" : "desc";
   const triageValue = rawTriage?.trim() || "shortlist";
   const source = rawSource && rawSource !== "all" ? rawSource : undefined;
   const needsRetriage = triageValue === "retriage" ? true : undefined;
@@ -52,14 +59,27 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     triageStatus,
     needsRetriage,
   });
+  const sortedJobs =
+    sortKey === "publishedAt"
+      ? [...jobs].sort((left, right) => {
+          const leftDate = getSortDate(left);
+          const rightDate = getSortDate(right);
+          if (!leftDate && !rightDate) return 0;
+          if (!leftDate) return 1;
+          if (!rightDate) return -1;
+          return sortOrder === "asc"
+            ? leftDate.localeCompare(rightDate)
+            : rightDate.localeCompare(leftDate);
+        })
+      : jobs;
   const pageSize =
     requestedPageSize && PAGE_SIZE_OPTIONS.includes(requestedPageSize)
       ? requestedPageSize
       : DEFAULT_PAGE_SIZE;
-  const totalJobs = jobs.length;
+  const totalJobs = sortedJobs.length;
   const totalPages = Math.max(1, Math.ceil(totalJobs / pageSize));
   const currentPage = Math.min(Math.max(requestedPage ?? 1, 1), totalPages);
-  const paginatedJobs = jobs.slice(
+  const paginatedJobs = sortedJobs.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );

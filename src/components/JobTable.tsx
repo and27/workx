@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Check, RefreshCw } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -56,6 +57,9 @@ export default function JobTable({
   action,
   variant,
 }: jobTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const savedSet = useMemo(() => new Set(savedJobIds), [savedJobIds]);
   const selectedJob = useMemo(
@@ -67,6 +71,34 @@ export default function JobTable({
   const handleClose = () => setActiveJobId(null);
 
   const emptyColSpan = variant === "home" ? 5 : 7;
+  const sortKey = searchParams.get("sort");
+  const sortOrder = searchParams.get("order") === "asc" ? "asc" : "desc";
+  const isPublishedSort = sortKey === "publishedAt";
+  const ariaSort =
+    variant === "list"
+      ? isPublishedSort
+        ? sortOrder === "asc"
+          ? "ascending"
+          : "descending"
+        : "none"
+      : undefined;
+
+  const handlePublishedSort = () => {
+    if (variant !== "list") return;
+    const params = new URLSearchParams(searchParams.toString());
+    const nextOrder = !isPublishedSort
+      ? "desc"
+      : sortOrder === "desc"
+        ? "asc"
+        : "desc";
+    params.set("sort", "publishedAt");
+    params.set("order", nextOrder);
+    params.delete("page");
+    const query = params.toString();
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, {
+      scroll: false,
+    });
+  };
 
   return (
     <>
@@ -81,7 +113,28 @@ export default function JobTable({
                 <TableHead>Senioridad</TableHead>
               </>
             )}
-            <TableHead>Publicado</TableHead>
+            <TableHead aria-sort={ariaSort}>
+              {variant === "list" ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                  onClick={handlePublishedSort}
+                >
+                  <span>Publicado</span>
+                  {isPublishedSort ? (
+                    sortOrder === "asc" ? (
+                      <ArrowUp className="size-3.5" />
+                    ) : (
+                      <ArrowDown className="size-3.5" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="size-3.5" />
+                  )}
+                </button>
+              ) : (
+                "Publicado"
+              )}
+            </TableHead>
             {variant === "list" && <TableHead>Fuente</TableHead>}
             {variant === "home" && <TableHead>Fuente</TableHead>}
             {variant === "list" && <TableHead>Tags</TableHead>}
@@ -95,30 +148,52 @@ export default function JobTable({
             return (
               <TableRow
                 key={job.id}
-              tabIndex={0}
-              role="button"
-              className="cursor-pointer transition hover:bg-muted/30"
-              onClick={() => handleOpen(job.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  handleOpen(job.id);
-                }
-              }}
+                tabIndex={0}
+                role="button"
+                className="cursor-pointer transition hover:bg-muted/30"
+                onClick={() => handleOpen(job.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handleOpen(job.id);
+                  }
+                }}
               >
-              <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
-                <JobSaveForm
-                  jobId={job.id}
-                  saved={savedSet.has(job.id)}
-                  action={action}
-                />
-              </TableCell>
-              <TableCell className="font-medium max-w-xs overflow-hidden">
-                <div className="space-y-0">
-                  {((job.needsRetriage && !isShortlist) ||
-                    (triageInfo && !isShortlist)) && (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
-                      {job.needsRetriage && !isShortlist && (
+                <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
+                  <JobSaveForm
+                    jobId={job.id}
+                    saved={savedSet.has(job.id)}
+                    action={action}
+                  />
+                </TableCell>
+                <TableCell className="font-medium max-w-xs overflow-hidden">
+                  <div className="space-y-0">
+                    {((job.needsRetriage && !isShortlist) ||
+                      (triageInfo && !isShortlist)) && (
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
+                        {job.needsRetriage && !isShortlist && (
+                          <Badge
+                            variant="outline"
+                            className={`${retriageBadgeClass} px-2`}
+                            title="Re-analizar"
+                          >
+                            <RefreshCw className="size-3" />
+                            <span className="sr-only">Re-analizar</span>
+                          </Badge>
+                        )}
+                        {triageInfo && !isShortlist && (
+                          <Badge
+                            variant="outline"
+                            className={`${triageBadgeClass(job.triageStatus)} px-2`}
+                            title={triageInfo.label}
+                          >
+                            {triageInfo.label}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                    {!triageInfo && job.needsRetriage && (
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <Badge
                           variant="outline"
                           className={`${retriageBadgeClass} px-2`}
@@ -127,109 +202,89 @@ export default function JobTable({
                           <RefreshCw className="size-3" />
                           <span className="sr-only">Re-analizar</span>
                         </Badge>
-                      )}
-                      {triageInfo && !isShortlist && (
-                        <Badge
-                          variant="outline"
-                          className={`${triageBadgeClass(job.triageStatus)} px-2`}
-                          title={triageInfo.label}
-                        >
-                          {triageInfo.label}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-                  {!triageInfo && job.needsRetriage && (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge
-                        variant="outline"
-                        className={`${retriageBadgeClass} px-2`}
-                        title="Re-analizar"
-                      >
-                        <RefreshCw className="size-3" />
-                        <span className="sr-only">Re-analizar</span>
-                      </Badge>
-                    </div>
-                  )}
-                  <div className="space-y-1 pl-1">
-                    <div className="flex items-center gap-2 truncate">
-                      {isShortlist && TriageIcon && (
-                        <span className="inline-flex items-center gap-1">
-                          <span
-                            className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${triageBadgeClass(job.triageStatus)}`}
-                            title={triageInfo?.label}
-                          >
-                            <TriageIcon className="size-3" />
-                            <span className="sr-only">{triageInfo?.label}</span>
-                          </span>
-                          {job.needsRetriage && (
+                      </div>
+                    )}
+                    <div className="space-y-1 pl-1">
+                      <div className="flex items-center gap-2 truncate">
+                        {isShortlist && TriageIcon && (
+                          <span className="inline-flex items-center gap-1">
                             <span
-                              className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${retriageBadgeClass}`}
-                              title="Re-analizar"
+                              className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${triageBadgeClass(job.triageStatus)}`}
+                              title={triageInfo?.label}
                             >
-                              <RefreshCw className="size-3" />
-                              <span className="sr-only">Re-analizar</span>
+                              <TriageIcon className="size-3" />
+                              <span className="sr-only">
+                                {triageInfo?.label}
+                              </span>
                             </span>
-                          )}
-                        </span>
-                      )}
-                      {variant === "list" && job.sourceUrl ? (
-                        <a
-                          href={job.sourceUrl}
-                          target="_blank"
-                          rel="noopener"
-                          className="underline-offset-4 hover:underline truncate"
-                          onClick={stopRowClick}
-                          onKeyDown={stopRowClick}
-                        >
-                          {job.role}
-                        </a>
-                      ) : (
-                        job.role
-                      )}
+                            {job.needsRetriage && (
+                              <span
+                                className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${retriageBadgeClass}`}
+                                title="Re-analizar"
+                              >
+                                <RefreshCw className="size-3" />
+                                <span className="sr-only">Re-analizar</span>
+                              </span>
+                            )}
+                          </span>
+                        )}
+                        {variant === "list" && job.sourceUrl ? (
+                          <a
+                            href={job.sourceUrl}
+                            target="_blank"
+                            rel="noopener"
+                            className="underline-offset-4 hover:underline truncate"
+                            onClick={stopRowClick}
+                            onKeyDown={stopRowClick}
+                          >
+                            {job.role}
+                          </a>
+                        ) : (
+                          job.role
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TableCell>
-              <TableCell className="max-w-40">
-                <div className="space-y-1">
-                  <div className="font-medium">{job.company}</div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {job.location}
+                </TableCell>
+                <TableCell className="max-w-40">
+                  <div className="space-y-1">
+                    <div className="font-medium">{job.company}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {job.location}
+                    </div>
                   </div>
-                </div>
-              </TableCell>
-              {variant === "list" && (
-                <>
+                </TableCell>
+                {variant === "list" && (
+                  <>
+                    <TableCell className="text-muted-foreground">
+                      {job.seniority}
+                    </TableCell>
+                  </>
+                )}
+                <TableCell className="text-muted-foreground">
+                  {formatRelativeDate(job.publishedAt)}
+                </TableCell>
+                {variant === "list" && (
                   <TableCell className="text-muted-foreground">
-                    {job.seniority}
+                    {job.source}
                   </TableCell>
-                </>
-              )}
-              <TableCell className="text-muted-foreground">
-                {formatRelativeDate(job.publishedAt)}
-              </TableCell>
-              {variant === "list" && (
-                <TableCell className="text-muted-foreground">
-                  {job.source}
-                </TableCell>
-              )}
-              {variant === "home" && (
-                <TableCell className="text-muted-foreground">
-                  {job.source}
-                </TableCell>
-              )}
-              {variant === "list" && (
-                <TableCell className="min-w-[240px]">
-                  <div className="flex max-h-12 flex-wrap gap-1 overflow-hidden pr-1">
-                    {job.tags.map((tag) => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </TableCell>
-              )}
+                )}
+                {variant === "home" && (
+                  <TableCell className="text-muted-foreground">
+                    {job.source}
+                  </TableCell>
+                )}
+                {variant === "list" && (
+                  <TableCell className="min-w-[240px]">
+                    <div className="flex max-h-12 flex-wrap gap-1 overflow-hidden pr-1">
+                      {job.tags.map((tag) => (
+                        <Badge key={tag} variant="outline">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}
