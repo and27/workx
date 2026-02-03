@@ -121,14 +121,19 @@ export default function JobDetailDialog({
         event.preventDefault();
         onClose();
       }}
-      onClick={(event) => {
-        if (event.target === dialogRef.current) {
-          onClose();
-        }
-      }}
     >
-      <div className="flex h-full items-start justify-center overflow-y-auto p-4">
-        <div className="flex w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background p-0 text-foreground shadow-xl max-h-[calc(100vh-2rem)]">
+      <div
+        className="flex h-full items-start justify-center overflow-y-auto p-4"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <div
+          className="flex w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background p-0 text-foreground shadow-xl max-h-[calc(100vh-2rem)]"
+          onClick={(event) => event.stopPropagation()}
+        >
           <div className="flex items-start justify-between gap-4 border-b border-border p-4">
             <div className="space-y-1">
               <h2 id={titleId} className="text-lg font-semibold">
