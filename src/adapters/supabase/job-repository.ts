@@ -9,6 +9,8 @@ import {
   jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
+  listJobsPageQuery,
+  listJobsPageResult,
   listJobsQuery,
 } from "@/src/ports/job-repository";
 
@@ -36,6 +38,9 @@ type jobRow = {
   created_at: string;
   updated_at: string;
 };
+
+const JOB_SUMMARY_FIELDS =
+  "id,company,role,source,source_url,external_id,location,seniority,tags,triage_status,triaged_at,triage_version,rank_score,rank_provider,rank_version,published_at,created_at,updated_at";
 
 const toJob = (row: jobRow): job => ({
   id: row.id,
@@ -147,6 +152,69 @@ export const createSupabaseJobRepository = (): jobRepository => ({
       throw new Error(error.message);
     }
     return (data ?? []).map((row) => toJob(row as jobRow));
+  },
+  async listPage(query: listJobsPageQuery): Promise<listJobsPageResult> {
+    let builder = supabase
+      .from("jobs")
+      .select(JOB_SUMMARY_FIELDS, { count: "exact" });
+
+    const orderBy = query.orderBy ?? "updatedAt";
+    if (orderBy === "publishedAt") {
+      builder = builder.order("published_at", {
+        ascending: query.order === "asc",
+        nullsFirst: false,
+      });
+      builder = builder.order("updated_at", { ascending: false });
+    } else if (orderBy === "rankScore") {
+      builder = builder.order("rank_score", {
+        ascending: false,
+        nullsFirst: false,
+      });
+      builder = builder.order("published_at", {
+        ascending: false,
+        nullsFirst: false,
+      });
+      builder = builder.order("updated_at", { ascending: false });
+    } else {
+      builder = builder.order("updated_at", {
+        ascending: query.order === "asc",
+      });
+    }
+
+    const search = query.search?.trim();
+    if (search) {
+      builder = builder.or(`company.ilike.%${search}%,role.ilike.%${search}%`);
+    }
+    if (query.seniority) {
+      builder = builder.eq("seniority", query.seniority);
+    }
+    if (query.source) {
+      builder = builder.eq("source", query.source);
+    }
+    const tags = query.tags?.filter(Boolean) ?? [];
+    if (tags.length > 0) {
+      builder = builder.contains("tags", tags);
+    }
+    if (query.triageStatus) {
+      if (query.triageStatus === "untriaged") {
+        builder = builder.is("triage_status", null);
+      } else {
+        builder = builder.eq("triage_status", query.triageStatus);
+      }
+    }
+
+    const offset = Math.max(0, query.offset);
+    const limit = Math.max(1, query.limit);
+    builder = builder.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await builder;
+    if (error) {
+      throw new Error(error.message);
+    }
+    return {
+      items: (data ?? []).map((row) => toJob(row as jobRow)),
+      total: count ?? 0,
+    };
   },
   async listSources() {
     const { data, error } = await supabase
