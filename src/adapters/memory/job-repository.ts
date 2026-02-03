@@ -41,6 +41,15 @@ const sortByPublishedAt = (left: job, right: job, order: "asc" | "desc") => {
     : rightDate.localeCompare(leftDate);
 };
 
+const sortByRecency = (left: job, right: job) => {
+  const leftDate = left.publishedAt ?? left.updatedAt;
+  const rightDate = right.publishedAt ?? right.updatedAt;
+  if (leftDate !== rightDate) {
+    return rightDate.localeCompare(leftDate);
+  }
+  return sortByUpdatedAt(left, right, "desc");
+};
+
 const sortByRankScore = (left: job, right: job) => {
   const leftScore = toSortableNumber(left.rankScore);
   const rightScore = toSortableNumber(right.rankScore);
@@ -48,7 +57,7 @@ const sortByRankScore = (left: job, right: job) => {
   if (leftScore === null) return 1;
   if (rightScore === null) return -1;
   if (leftScore !== rightScore) return rightScore - leftScore;
-  return sortByPublishedAt(left, right, "desc");
+  return sortByRecency(left, right);
 };
 
 const sortJobs = (items: job[], query: listJobsPageQuery) => {
