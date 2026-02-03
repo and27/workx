@@ -110,22 +110,6 @@ export default async function ApplicationDetailPage({
             </div>
           </div>
 
-          {job && (
-            <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 p-3">
-              <div>
-                <p className="text-sm font-medium">Vacante asociada</p>
-                <p className="text-xs text-muted-foreground">
-                  {job.role} · {job.company}
-                </p>
-              </div>
-              <ApplicationJobDetail
-                job={job}
-                saved={Boolean(application.jobId)}
-                action={saveJobAction}
-              />
-            </div>
-          )}
-
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground" htmlFor="notes">
               Notas
@@ -144,6 +128,22 @@ export default async function ApplicationDetailPage({
             </Button>
           </div>
         </form>
+
+        {job && (
+          <div className="mt-4 flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 p-3">
+            <div>
+              <p className="text-sm font-medium">Vacante asociada</p>
+              <p className="text-xs text-muted-foreground">
+                {job.role} · {job.company}
+              </p>
+            </div>
+            <ApplicationJobDetail
+              job={job}
+              saved={Boolean(application.jobId)}
+              action={saveJobAction}
+            />
+          </div>
+        )}
       </section>
 
       <section className="space-y-3">
