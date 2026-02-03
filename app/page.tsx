@@ -1,46 +1,64 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { unstable_cache } from "next/cache";
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
+import { HOME_CACHE_TAG, HOME_CACHE_TTL } from "@/src/lib/cache-tags";
 import { formatDate } from "@/src/lib/format";
 import JobTable from "@/src/components/JobTable";
 
 const HOME_JOBS_LIMIT = 5;
 const HOME_LOGS_LIMIT = 6;
 
+const getHomeData = unstable_cache(
+  async () => {
+    const {
+      listHomeOverview,
+      listJobsPage,
+      listApplicationLogs,
+      listApplications,
+    } = await getUseCases();
+    const [overview, jobsPage] = await Promise.all([
+      listHomeOverview(),
+      listJobsPage({ page: 1, pageSize: HOME_JOBS_LIMIT }),
+    ]);
+    const jobs = jobsPage.items;
+    const jobIds = jobs.map((job) => job.id);
+    const savedJobIds =
+      jobIds.length > 0
+        ? Array.from(
+            new Set(
+              (await listApplications({ jobIds }))
+                .map((application) => application.jobId)
+                .filter((jobId): jobId is string => Boolean(jobId))
+            )
+          )
+        : [];
+    const recentLogs = overview.latestApplicationId
+      ? await listApplicationLogs({
+          applicationId: overview.latestApplicationId,
+          limit: HOME_LOGS_LIMIT,
+        })
+      : [];
+    return {
+      overview,
+      jobs,
+      savedJobIds,
+      recentLogs,
+    };
+  },
+  ["home-data"],
+  { revalidate: HOME_CACHE_TTL, tags: [HOME_CACHE_TAG] }
+);
+
 export default async function Home() {
-  const { listHomeOverview, listJobsPage, listApplicationLogs, listApplications } =
-    await getUseCases();
-  const [overview, jobsPage] = await Promise.all([
-    listHomeOverview(),
-    listJobsPage({ page: 1, pageSize: HOME_JOBS_LIMIT }),
-  ]);
-  const jobs = jobsPage.items;
+  const { overview, jobs, savedJobIds, recentLogs } = await getHomeData();
   const {
     totalApplications,
     activeInterviews,
     overdueCount,
     thisWeek,
-    latestApplicationId,
   } = overview;
-
-  const jobIds = jobs.map((job) => job.id);
-  const savedJobIds =
-    jobIds.length > 0
-      ? Array.from(
-          new Set(
-            (await listApplications({ jobIds }))
-              .map((application) => application.jobId)
-              .filter((jobId): jobId is string => Boolean(jobId))
-          )
-        )
-      : [];
-  const recentLogs = latestApplicationId
-    ? await listApplicationLogs({
-        applicationId: latestApplicationId,
-        limit: HOME_LOGS_LIMIT,
-      })
-    : [];
 
   return (
     <div className="space-y-8">

@@ -1,11 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getUseCases } from "@/src/composition/usecases";
+import { HOME_CACHE_TAG } from "@/src/lib/cache-tags";
 
 const revalidateAll = () => {
   revalidatePath("/inbox");
   revalidatePath("/applications");
+  revalidateTag(HOME_CACHE_TAG);
 };
 
 export async function archiveAction(formData: FormData) {
