@@ -18,6 +18,7 @@ type applicationsPageProps = {
     q?: string;
     status?: applicationStatus | "all";
     priority?: priority | "all";
+    recent?: string;
   }>;
 };
 
@@ -29,14 +30,20 @@ export default async function ApplicationsPage({
   const search = params.q?.trim() ?? "";
   const rawStatus = params.status;
   const rawPriority = params.priority;
+  const recent = params.recent;
   const status = rawStatus && rawStatus !== "all" ? rawStatus : undefined;
   const priority =
     rawPriority && rawPriority !== "all" ? rawPriority : undefined;
+  const updatedAfter =
+    recent === "week"
+      ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      : undefined;
 
   const applications = await listApplications({
     search: search || undefined,
     status,
     priority,
+    updatedAfter,
   });
 
   return (
