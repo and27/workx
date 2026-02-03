@@ -9,6 +9,7 @@ import {
 import { memoryStore } from "@/src/adapters/memory/store";
 import { createJobSourceRouter } from "@/src/adapters/job-source-router";
 import { createRemotiveJobSource } from "@/src/adapters/remotive/job-source";
+import { createRemoteOkJobSource } from "@/src/adapters/remote-ok/job-source";
 import { createJobTriageAdapter } from "@/src/adapters/triage/job-triage";
 import { createWeb3JobSource } from "@/src/adapters/web3-jobs/job-source";
 import { createWwrJobSource } from "@/src/adapters/wwr/job-source";
@@ -39,6 +40,7 @@ const createMemoryRepositories = () => {
     jobRepository: createMemoryJobRepository(store),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
+      { source: "Remote OK", adapter: createRemoteOkJobSource() },
       { source: "Web3", adapter: createWeb3JobSource() },
       { source: "WWR", adapter: createWwrJobSource() },
     ]),
@@ -65,6 +67,7 @@ export async function getRepositories() {
     jobRepository: createSupabaseJobRepository(),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
+      { source: "Remote OK", adapter: createRemoteOkJobSource() },
       { source: "Web3", adapter: createWeb3JobSource() },
       { source: "WWR", adapter: createWwrJobSource() },
     ]),

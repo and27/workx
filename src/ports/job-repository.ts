@@ -29,6 +29,7 @@ export type jobTriageUpdate = {
   triageReasons: string[] | null;
   triagedAt: isoDateTime | null;
   triageProvider: triageProvider | null;
+  triageVersion: number | null;
 };
 
 export type jobUpsertResult = {

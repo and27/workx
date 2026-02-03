@@ -1,4 +1,5 @@
 export type userProfile = {
+  profileVersion: number;
   mustHaveKeywords: string[];
   hardNoKeywords: string[];
   preferredKeywords: string[];

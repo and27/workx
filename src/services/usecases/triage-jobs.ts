@@ -17,13 +17,44 @@ export type triageJobsOutput = {
   processed: number;
   triaged: number;
   skipped: number;
+  openaiUsed: number;
+  openaiSkippedCap: number;
 };
 
 export type triageJobsDeps = {
   jobRepository: jobRepository;
   jobTriage: jobTriagePort;
   profile: userProfile;
+  ollamaConfigured: boolean;
 };
+
+type openAiUsageState = {
+  dateKey: string;
+  used: number;
+};
+
+const openAiUsage: openAiUsageState = { dateKey: "", used: 0 };
+
+const toDateKey = (date = new Date()) => date.toISOString().slice(0, 10);
+
+const getOpenAiDailyCap = () => {
+  const raw = process.env.OPENAI_DAILY_CAP?.trim();
+  const parsed = raw ? Number(raw) : 10;
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.max(0, Math.floor(parsed));
+};
+
+const getOpenAiUsage = () => {
+  const today = toDateKey();
+  if (openAiUsage.dateKey !== today) {
+    openAiUsage.dateKey = today;
+    openAiUsage.used = 0;
+  }
+  return openAiUsage;
+};
+
+const hasOpenAiConfig = () =>
+  Boolean(process.env.OPENAI_API_KEY?.trim() && process.env.OPENAI_MODEL?.trim());
 
 const isRecent = (jobRecord: job, days: number) => {
   const reference =
@@ -47,6 +78,10 @@ export const createTriageJobsUseCase =
     const mode = input.mode === "recent" ? "recent" : "new";
     const days = input.days && input.days > 0 ? input.days : 14;
 
+    if (!dependencies.ollamaConfigured) {
+      return err(new Error("Configura Ollama para analizar trabajos."));
+    }
+
     const items =
       mode === "new"
         ? await dependencies.jobRepository.list({ triageStatus: "untriaged" })
@@ -59,12 +94,25 @@ export const createTriageJobsUseCase =
 
     let triaged = 0;
     let skipped = 0;
+    let openaiUsed = 0;
+    let openaiSkippedCap = 0;
+    const openAiCap = getOpenAiDailyCap();
+    const openAiEnabled = hasOpenAiConfig();
 
     for (const jobRecord of candidates) {
-      const coarse = await dependencies.jobTriage.coarse({
-        job: jobRecord,
-        profile: dependencies.profile,
-      });
+      let coarse: Awaited<ReturnType<jobTriagePort["coarse"]>>;
+      try {
+        coarse = await dependencies.jobTriage.coarse({
+          job: jobRecord,
+          profile: dependencies.profile,
+        });
+      } catch (error) {
+        return err(
+          error instanceof Error
+            ? error
+            : new Error("Ollama no está disponible.")
+        );
+      }
       if (!coarse) {
         skipped += 1;
         continue;
@@ -72,13 +120,26 @@ export const createTriageJobsUseCase =
 
       let finalDecision = coarse;
       if (coarse.status === "maybe") {
-        const disambiguated = await dependencies.jobTriage.disambiguate({
-          job: jobRecord,
-          profile: dependencies.profile,
-          previous: coarse,
-        });
-        if (disambiguated) {
-          finalDecision = disambiguated;
+        if (!openAiEnabled) {
+          // OpenAI not configured; keep coarse decision.
+        } else if (openAiCap <= 0) {
+          openaiSkippedCap += 1;
+        } else {
+          const usage = getOpenAiUsage();
+          if (usage.used >= openAiCap) {
+            openaiSkippedCap += 1;
+          } else {
+            usage.used += 1;
+            openaiUsed += 1;
+            const disambiguated = await dependencies.jobTriage.disambiguate({
+              job: jobRecord,
+              profile: dependencies.profile,
+              previous: coarse,
+            });
+            if (disambiguated) {
+              finalDecision = disambiguated;
+            }
+          }
         }
       }
 
@@ -91,6 +152,7 @@ export const createTriageJobsUseCase =
             triageReasons: finalDecision.reasons,
             triagedAt,
             triageProvider: finalDecision.provider,
+            triageVersion: dependencies.profile.profileVersion,
           },
         });
         triaged += 1;
@@ -105,5 +167,7 @@ export const createTriageJobsUseCase =
       processed: candidates.length,
       triaged,
       skipped,
+      openaiUsed,
+      openaiSkippedCap,
     });
   };

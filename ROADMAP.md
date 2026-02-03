@@ -58,7 +58,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 **Delivers:**
 
 - Manual job ingestion (Remotive source).
-- API trigger for ingestion.
+- API trigger for ingestion (Remotive endpoint).
 - Jobs list in UI.
 - “Top matches today” (flat list, no ranking).
 - Deduplication via `(source, externalId)` upsert.
@@ -70,6 +70,35 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 **Exit criteria:**
 
 - Jobs can be ingested manually and reviewed daily.
+
+---
+
+## Phase 2.2 – Multi-source Job Discovery (Epic 4) ✅ Complete
+
+**Goal:** Expand manual ingestion to multiple sources without UI changes.
+
+**Delivers:**
+
+- Additional sources (WWR + Web3 + Remote OK).
+- Composite jobSource router for source-based ingestion.
+- Generic `/api/ingest` endpoint + source-specific routes.
+- Normalization/dedup by `(source, externalId)` across sources.
+
+**Status update (2026-02-02):**
+- ✅ WWR adapter
+- ✅ Web3 adapter
+- ✅ Remote OK adapter
+- ✅ Multi-source router + generic ingest endpoint
+
+**Non-goals:**
+
+- Scheduling/cron ingestion.
+- Ranking or scoring.
+
+**Exit criteria:**
+
+- Each configured source ingests successfully via `/api/ingest`.
+- Adding a new source requires no UI changes.
 
 ---
 
@@ -118,6 +147,14 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
   - Reasons and dealbreakers
 - Default view surfaces only “Selected for you”.
 - Lightweight scoring (heuristic, not ML-heavy).
+
+**Status update (2026-02-02):**
+- ✅ User profile is defined in composition.
+- ✅ Job triage fields persist on Job (status/reasons/provider/triagedAt).
+- ✅ Coarse triage via Ollama with confidence gating.
+- ✅ Jobs UI defaults to shortlist-first + triage badge; reasons live in job detail modal.
+- 🟡 OpenAI disambiguation exists but lacks structured schema + daily caps.
+- ⏳ Versioned re-triage on profile changes not implemented yet.
 
 **Non-goals:**
 

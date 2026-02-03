@@ -140,6 +140,24 @@ A PR is "done" only when:
 - Updates create corresponding log entries.
 - Required use case unit tests pass.
 
+## Workflow (Branches, PRs, Issues)
+
+- Integration branch is `dev`; feature branches PR into `dev`.
+- `main` is release-only; merge `dev` → `main` when cutting a version.
+- All changes require a GitHub issue/ticket **before** implementation (no exceptions).
+- Changes must align with the current roadmap phase/epic; out-of-order work requires explicit agreement recorded in the issue and PR.
+- Use the PR template in `.github/pull_request_template.md`.
+- PR body format must include **Summary** and **Testing** sections.
+- Always set PR body via `gh pr create/edit --body-file` using a PowerShell here-string:
+  - `@'` ... ` '@` (ensures correct markdown formatting).
+- Every PR must reference its issue and include `Closes #NN` in the PR body.
+- When adding DB fields, update both `supabase/schema.sql` and add a migration in `supabase/migrations/`.
+
+## Roadmap Hygiene
+
+- Phases are timeline milestones; Epics are work groupings (not 1:1).
+- Keep timeline correctness (e.g., Phase 2 original vs Epic 4 expansion).
+
 ## Commit/PR Style (preferred)
 
 - Small commits, semantic messages:

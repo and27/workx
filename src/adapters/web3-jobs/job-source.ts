@@ -1,4 +1,8 @@
 import { jobSource, jobSourceRecord } from "@/src/ports/job-source";
+import {
+  normalizeSeniority,
+  toTags,
+} from "@/src/adapters/job-source-helpers";
 
 type web3Job = {
   id?: number | string;
@@ -25,39 +29,6 @@ const shouldInclude = (record: jobSourceRecord) => {
     .map(toSearchText)
     .join(" ");
   return includeKeywords.some((keyword) => haystack.includes(keyword));
-};
-
-const toTags = (value: unknown): string[] => {
-  if (Array.isArray(value)) {
-    return value
-      .filter((item): item is string => typeof item === "string")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  if (typeof value === "string") {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
-};
-
-const normalizeSeniority = (title: string) => {
-  const normalized = title.toLowerCase();
-  if (normalized.includes("intern")) return "Intern";
-  if (normalized.includes("junior") || normalized.includes("jr"))
-    return "Junior";
-  if (normalized.includes("senior") || normalized.includes("sr"))
-    return "Senior";
-  if (
-    normalized.includes("staff") ||
-    normalized.includes("principal") ||
-    normalized.includes("lead")
-  ) {
-    return "Lead";
-  }
-  return "Mid";
 };
 
 const toPublishedAt = (job: web3Job) => {

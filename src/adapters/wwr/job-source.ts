@@ -1,5 +1,9 @@
 import Parser from "rss-parser";
 import { jobSource, jobSourceRecord } from "@/src/ports/job-source";
+import {
+  normalizeSeniority,
+  toPublishedAt,
+} from "@/src/adapters/job-source-helpers";
 
 const SOURCE = "WWR";
 const FEED_URL =
@@ -26,29 +30,6 @@ const stripHtml = (value: string) =>
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-
-const toPublishedAt = (value?: string | null) => {
-  if (!value) return null;
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
-};
-
-const normalizeSeniority = (title: string) => {
-  const normalized = title.toLowerCase();
-  if (normalized.includes("intern")) return "Intern";
-  if (normalized.includes("junior") || normalized.includes("jr"))
-    return "Junior";
-  if (normalized.includes("senior") || normalized.includes("sr"))
-    return "Senior";
-  if (
-    normalized.includes("staff") ||
-    normalized.includes("principal") ||
-    normalized.includes("lead")
-  ) {
-    return "Lead";
-  }
-  return "Mid";
-};
 
 const splitOn = (value: string, delimiter: string) => {
   const index = value.indexOf(delimiter);
