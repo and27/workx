@@ -11,6 +11,18 @@ export type listJobsQuery = {
   triageStatus?: triageStatus | "untriaged";
 };
 
+export type listJobsPageQuery = listJobsQuery & {
+  limit: number;
+  offset: number;
+  orderBy?: "updatedAt" | "publishedAt" | "rankScore";
+  order?: "asc" | "desc";
+};
+
+export type listJobsPageResult = {
+  items: job[];
+  total: number;
+};
+
 export type jobUpsertRecord = {
   externalId: string;
   source: string;
@@ -59,6 +71,7 @@ export type jobUpsertResult = {
 
 export interface jobRepository {
   list(query: listJobsQuery): Promise<job[]>;
+  listPage(query: listJobsPageQuery): Promise<listJobsPageResult>;
   listSources(): Promise<string[]>;
   getById(query: { id: string }): Promise<job | null>;
   create(input: { job: jobCreateRecord; now: isoDateTime }): Promise<job>;

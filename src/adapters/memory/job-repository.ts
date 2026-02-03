@@ -6,6 +6,8 @@ import {
   jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
+  listJobsPageQuery,
+  listJobsPageResult,
 } from "@/src/ports/job-repository";
 import { memoryStore } from "@/src/adapters/memory/store";
 
@@ -20,6 +22,49 @@ const matchesSearch = (jobRecord: job, search: string) => {
 const matchesTags = (jobRecord: job, tags: string[]) =>
   tags.every((tag) => jobRecord.tags.includes(tag));
 
+const toSortableNumber = (value: number | null) =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
+const sortByUpdatedAt = (left: job, right: job, order: "asc" | "desc") =>
+  order === "asc"
+    ? left.updatedAt.localeCompare(right.updatedAt)
+    : right.updatedAt.localeCompare(left.updatedAt);
+
+const sortByPublishedAt = (left: job, right: job, order: "asc" | "desc") => {
+  const leftDate = left.publishedAt;
+  const rightDate = right.publishedAt;
+  if (!leftDate && !rightDate) return 0;
+  if (!leftDate) return 1;
+  if (!rightDate) return -1;
+  return order === "asc"
+    ? leftDate.localeCompare(rightDate)
+    : rightDate.localeCompare(leftDate);
+};
+
+const sortByRankScore = (left: job, right: job) => {
+  const leftScore = toSortableNumber(left.rankScore);
+  const rightScore = toSortableNumber(right.rankScore);
+  if (leftScore === null && rightScore === null) return 0;
+  if (leftScore === null) return 1;
+  if (rightScore === null) return -1;
+  if (leftScore !== rightScore) return rightScore - leftScore;
+  return sortByPublishedAt(left, right, "desc");
+};
+
+const sortJobs = (items: job[], query: listJobsPageQuery) => {
+  const orderBy = query.orderBy ?? "updatedAt";
+  if (orderBy === "publishedAt") {
+    return [...items].sort((left, right) =>
+      sortByPublishedAt(left, right, query.order ?? "desc")
+    );
+  }
+  if (orderBy === "rankScore") {
+    return [...items].sort(sortByRankScore);
+  }
+  return [...items].sort((left, right) =>
+    sortByUpdatedAt(left, right, query.order ?? "desc")
+  );
+};
 const toHex = (value: number, length: number) =>
   value.toString(16).padStart(length, "0");
 
@@ -147,6 +192,39 @@ export const createMemoryJobRepository = (
       }
       return true;
     });
+  },
+  async listPage(query: listJobsPageQuery): Promise<listJobsPageResult> {
+    const search = query.search?.trim();
+    const tags = query.tags?.filter(Boolean) ?? [];
+    const filtered = store.jobs.filter((record) => {
+      if (search && !matchesSearch(record, search)) {
+        return false;
+      }
+      if (query.seniority && record.seniority !== query.seniority) {
+        return false;
+      }
+      if (query.source && record.source !== query.source) {
+        return false;
+      }
+      if (tags.length > 0 && !matchesTags(record, tags)) {
+        return false;
+      }
+      if (query.triageStatus) {
+        if (query.triageStatus === "untriaged") {
+          return record.triageStatus === null;
+        }
+        return record.triageStatus === query.triageStatus;
+      }
+      return true;
+    });
+
+    const sorted = sortJobs(filtered, query);
+    const total = sorted.length;
+    const offset = Math.max(0, query.offset);
+    const limit = Math.max(1, query.limit);
+    const items = sorted.slice(offset, offset + limit);
+
+    return { items, total };
   },
   async listSources() {
     return Array.from(new Set(store.jobs.map((record) => record.source)));
