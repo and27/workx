@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Check, RefreshCw } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -33,10 +34,12 @@ const stopRowClick = (event: MouseEvent | KeyboardEvent) => {
   event.stopPropagation();
 };
 
-const triageLabel = (status: job["triageStatus"]) => {
-  if (status === "shortlist") return "Seleccionado";
-  if (status === "maybe") return "Quizas";
-  if (status === "reject") return "Rechazado";
+const triageDisplay = (status: job["triageStatus"]) => {
+  if (status === "shortlist") {
+    return { label: "Seleccionado", icon: Check };
+  }
+  if (status === "maybe") return { label: "Quizas" };
+  if (status === "reject") return { label: "Rechazado" };
   return null;
 };
 
@@ -85,9 +88,12 @@ export default function JobTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {jobs.map((job) => (
-            <TableRow
-              key={job.id}
+          {jobs.map((job) => {
+            const triageInfo = triageDisplay(job.triageStatus);
+            const TriageIcon = triageInfo?.icon;
+            return (
+              <TableRow
+                key={job.id}
               tabIndex={0}
               role="button"
               className="cursor-pointer transition hover:bg-muted/30"
@@ -98,7 +104,7 @@ export default function JobTable({
                   handleOpen(job.id);
                 }
               }}
-            >
+              >
               <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
                 <JobSaveForm
                   jobId={job.id}
@@ -108,31 +114,43 @@ export default function JobTable({
               </TableCell>
               <TableCell className="font-medium max-w-xs overflow-hidden">
                 <div className="space-y-0">
-                  {triageLabel(job.triageStatus) && (
+                  {triageInfo && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
                       {job.needsRetriage && (
                         <Badge
                           variant="outline"
                           className={`${retriageBadgeClass} px-2`}
+                          title="Re-analizar"
                         >
-                          Re-analizar
+                          <RefreshCw className="size-3" />
+                          <span className="sr-only">Re-analizar</span>
                         </Badge>
                       )}
                       <Badge
                         variant="outline"
                         className={`${triageBadgeClass(job.triageStatus)} px-2`}
+                        title={triageInfo.label}
                       >
-                        {triageLabel(job.triageStatus)}
+                        {TriageIcon ? (
+                          <>
+                            <TriageIcon className="size-3" />
+                            <span className="sr-only">{triageInfo.label}</span>
+                          </>
+                        ) : (
+                          triageInfo.label
+                        )}
                       </Badge>
                     </div>
                   )}
-                  {!triageLabel(job.triageStatus) && job.needsRetriage && (
+                  {!triageInfo && job.needsRetriage && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <Badge
                         variant="outline"
                         className={`${retriageBadgeClass} px-2`}
+                        title="Re-analizar"
                       >
-                        Re-analizar
+                        <RefreshCw className="size-3" />
+                        <span className="sr-only">Re-analizar</span>
                       </Badge>
                     </div>
                   )}
@@ -195,8 +213,9 @@ export default function JobTable({
                   </div>
                 </TableCell>
               )}
-            </TableRow>
-          ))}
+              </TableRow>
+            );
+          })}
           {jobs.length === 0 && (
             <TableRow>
               <TableCell
