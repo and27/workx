@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { emitTriageStatus } from "@/src/lib/triage-status";
 
 type triageMode = "new" | "recent";
 
@@ -30,6 +31,7 @@ export default function TriageControls() {
   const runTriage = async (mode: triageMode) => {
     if (pendingMode) return;
     setPendingMode(mode);
+    emitTriageStatus(true);
     try {
       const response = await fetch("/api/triage/jobs", {
         method: "POST",
@@ -48,13 +50,21 @@ export default function TriageControls() {
       if (!response.ok || !payload.ok) {
         throw new Error(payload.error ?? "No pudimos analizar trabajos.");
       }
+      const processed = payload.processed ?? 0;
+      const triaged = payload.triaged ?? 0;
+      const skipped = payload.skipped ?? 0;
       const skippedByCap = payload.openaiSkippedCap ?? 0;
+      const summaryParts = [
+        `Procesados: ${processed}`,
+        `Actualizados: ${triaged}`,
+        `Omitidos: ${skipped}`,
+      ];
+      if (skippedByCap > 0) {
+        summaryParts.push(`OpenAI limite: ${skippedByCap}`);
+      }
       toast({
-        title: `Analisis listo: ${payload.triaged ?? 0} actualizados.`,
-        description:
-          skippedByCap > 0
-            ? `Se omitieron ${skippedByCap} revisiones por limite diario de OpenAI.`
-            : undefined,
+        title: "Analisis listo.",
+        description: summaryParts.join(" • "),
         variant: "success",
       });
       handleClose();
@@ -69,6 +79,7 @@ export default function TriageControls() {
       });
     } finally {
       setPendingMode(null);
+      emitTriageStatus(false);
     }
   };
 
