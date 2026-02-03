@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getUseCases } from "@/src/composition/usecases";
+import { HOME_CACHE_PROFILE, HOME_CACHE_TAG } from "@/src/lib/cache-tags";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,6 +19,7 @@ export async function GET(request: Request) {
         { status: 500 }
       );
     }
+    revalidateTag(HOME_CACHE_TAG, HOME_CACHE_PROFILE);
     return NextResponse.json({ ok: true, ...result.value });
   } catch (error) {
     console.error("WWR ingest failed", error);
