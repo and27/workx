@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { supabase } from "@/src/adapters/supabase/client";
 import { job } from "@/src/domain/entities/job";
+import { triageStatus } from "@/src/domain/types/triage-status";
 import {
   jobRepository,
   jobTriageUpdate,
@@ -40,7 +41,7 @@ const toJob = (row: jobRow): job => ({
   seniority: row.seniority,
   tags: row.tags ?? [],
   description: row.description ?? null,
-  triageStatus: row.triage_status ?? null,
+  triageStatus: toTriageStatus(row.triage_status),
   triageReasons: row.triage_reasons ?? null,
   triagedAt: row.triaged_at ?? null,
   triageProvider: row.triage_provider ?? null,
@@ -49,6 +50,13 @@ const toJob = (row: jobRow): job => ({
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
+
+const toTriageStatus = (value: string | null): triageStatus | null => {
+  if (value === "shortlist" || value === "maybe" || value === "reject") {
+    return value;
+  }
+  return null;
+};
 
 const toUpsertRow = (record: jobUpsertRecord, now: string) => ({
   company: record.company,
