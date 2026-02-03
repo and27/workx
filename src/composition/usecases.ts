@@ -5,7 +5,9 @@ import { createGetJobUseCase } from "@/src/services/usecases/get-job";
 import { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
 import { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
 import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
+import { createListInboxOverviewUseCase } from "@/src/services/usecases/list-inbox-overview";
 import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
+import { createListJobSourcesUseCase } from "@/src/services/usecases/list-job-sources";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
@@ -24,9 +26,15 @@ async function buildUseCases() {
     listInbox: createListInboxUseCase({
       applicationRepository: repositories.applicationRepository,
     }),
+    listInboxOverview: createListInboxOverviewUseCase({
+      applicationRepository: repositories.applicationRepository,
+    }),
     listJobs: createListJobsUseCase({
       jobRepository: repositories.jobRepository,
       profile: defaultUserProfile,
+    }),
+    listJobSources: createListJobSourcesUseCase({
+      jobRepository: repositories.jobRepository,
     }),
     ingestJobs: createIngestJobsUseCase({
       jobSource: repositories.jobSource,

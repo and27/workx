@@ -98,6 +98,16 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     }
     return (data ?? []).map((row) => toJob(row as jobRow));
   },
+  async listSources() {
+    const { data, error } = await supabase.from("jobs").select("source");
+    if (error) {
+      throw new Error(error.message);
+    }
+    const sources = (data ?? [])
+      .map((row) => row.source)
+      .filter((value): value is string => Boolean(value));
+    return Array.from(new Set(sources));
+  },
   async getById(query: { id: string }) {
     const { data, error } = await supabase
       .from("jobs")
