@@ -14,6 +14,7 @@ import { updateApplicationUseCase } from "@/src/services/usecases/update-applica
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
 import { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
+import { createRankShortlistUseCase } from "@/src/services/usecases/rank-shortlist";
 import { defaultUserProfile } from "@/src/composition/user-profile";
 
 let _usecases: Awaited<ReturnType<typeof buildUseCases>> | null = null;
@@ -57,6 +58,11 @@ async function buildUseCases() {
         process.env.OLLAMA_BASE_URL?.trim() &&
           process.env.OLLAMA_MODEL?.trim()
       ),
+    }),
+    rankShortlist: createRankShortlistUseCase({
+      jobRepository: repositories.jobRepository,
+      jobRanker: repositories.jobRanker,
+      profile: defaultUserProfile,
     }),
     createApplicationFromJob: createApplicationFromJobUseCase({
       applicationRepository: repositories.applicationRepository,

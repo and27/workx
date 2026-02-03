@@ -1,6 +1,7 @@
 import { job } from "@/src/domain/entities/job";
 import {
   jobRepository,
+  jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
@@ -73,6 +74,10 @@ const applyUpsert = (
     triagedAt: null,
     triageProvider: null,
     triageVersion: null,
+    rankScore: null,
+    rankReason: null,
+    rankProvider: null,
+    rankVersion: null,
     publishedAt: record.publishedAt,
     createdAt: now,
     updatedAt: now,
@@ -135,6 +140,23 @@ export const createMemoryJobRepository = (
       triagedAt: input.patch.triagedAt,
       triageProvider: input.patch.triageProvider,
       triageVersion: input.patch.triageVersion,
+    };
+    store.jobs[index] = updated;
+    return updated;
+  },
+  async updateRank(input: { id: string; patch: jobRankUpdate }) {
+    const index = store.jobs.findIndex((record) => record.id === input.id);
+    if (index < 0) {
+      throw new Error(`Job not found: ${input.id}`);
+    }
+    const current = store.jobs[index];
+    const updated = {
+      ...current,
+      rankScore: input.patch.rankScore,
+      rankReason: input.patch.rankReason,
+      rankProvider: input.patch.rankProvider,
+      rankVersion: input.patch.rankVersion,
+      updatedAt: new Date().toISOString(),
     };
     store.jobs[index] = updated;
     return updated;
