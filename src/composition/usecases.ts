@@ -6,6 +6,7 @@ import { createListApplicationLogsUseCase } from "@/src/services/usecases/list-a
 import { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
 import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 import { createListInboxOverviewUseCase } from "@/src/services/usecases/list-inbox-overview";
+import { createListHomeOverviewUseCase } from "@/src/services/usecases/list-home-overview";
 import { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 import { createListJobsPageUseCase } from "@/src/services/usecases/list-jobs-page";
 import { createListJobSourcesUseCase } from "@/src/services/usecases/list-job-sources";
@@ -28,6 +29,9 @@ async function buildUseCases() {
       applicationRepository: repositories.applicationRepository,
     }),
     listInboxOverview: createListInboxOverviewUseCase({
+      applicationRepository: repositories.applicationRepository,
+    }),
+    listHomeOverview: createListHomeOverviewUseCase({
       applicationRepository: repositories.applicationRepository,
     }),
     listJobs: createListJobsUseCase({
