@@ -91,6 +91,7 @@ export default function JobTable({
           {jobs.map((job) => {
             const triageInfo = triageDisplay(job.triageStatus);
             const TriageIcon = triageInfo?.icon;
+            const isShortlist = job.triageStatus === "shortlist";
             return (
               <TableRow
                 key={job.id}
@@ -114,7 +115,7 @@ export default function JobTable({
               </TableCell>
               <TableCell className="font-medium max-w-xs overflow-hidden">
                 <div className="space-y-0">
-                  {triageInfo && (
+                  {(job.needsRetriage || (triageInfo && !isShortlist)) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground ">
                       {job.needsRetriage && (
                         <Badge
@@ -126,20 +127,15 @@ export default function JobTable({
                           <span className="sr-only">Re-analizar</span>
                         </Badge>
                       )}
-                      <Badge
-                        variant="outline"
-                        className={`${triageBadgeClass(job.triageStatus)} px-2`}
-                        title={triageInfo.label}
-                      >
-                        {TriageIcon ? (
-                          <>
-                            <TriageIcon className="size-3" />
-                            <span className="sr-only">{triageInfo.label}</span>
-                          </>
-                        ) : (
-                          triageInfo.label
-                        )}
-                      </Badge>
+                      {triageInfo && !isShortlist && (
+                        <Badge
+                          variant="outline"
+                          className={`${triageBadgeClass(job.triageStatus)} px-2`}
+                          title={triageInfo.label}
+                        >
+                          {triageInfo.label}
+                        </Badge>
+                      )}
                     </div>
                   )}
                   {!triageInfo && job.needsRetriage && (
@@ -155,7 +151,16 @@ export default function JobTable({
                     </div>
                   )}
                   <div className="space-y-1 pl-1">
-                    <div className="truncate">
+                    <div className="flex items-center gap-2 truncate">
+                      {isShortlist && TriageIcon && (
+                        <span
+                          className={`inline-flex size-5 shrink-0 items-center justify-center rounded border ${triageBadgeClass(job.triageStatus)}`}
+                          title={triageInfo?.label}
+                        >
+                          <TriageIcon className="size-3" />
+                          <span className="sr-only">{triageInfo?.label}</span>
+                        </span>
+                      )}
                       {variant === "list" && job.sourceUrl ? (
                         <a
                           href={job.sourceUrl}
