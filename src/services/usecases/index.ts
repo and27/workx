@@ -8,6 +8,7 @@ export type {
   triageJobsOutput,
 } from "@/src/services/usecases/triage-jobs";
 export type { getApplicationInput } from "@/src/services/usecases/get-application";
+export type { getJobInput } from "@/src/services/usecases/get-job";
 export type {
   listApplicationLogsInput,
 } from "@/src/services/usecases/list-application-logs";
@@ -30,6 +31,7 @@ export { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 export { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
 export { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
 export { createGetApplicationUseCase } from "@/src/services/usecases/get-application";
+export { createGetJobUseCase } from "@/src/services/usecases/get-job";
 export { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
 export { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";
 export { updateApplicationUseCase } from "@/src/services/usecases/update-application";

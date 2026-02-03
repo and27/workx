@@ -1,6 +1,7 @@
 import { getRepositories } from "@/src/composition/repositories";
 import { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";
 import { createGetApplicationUseCase } from "@/src/services/usecases/get-application";
+import { createGetJobUseCase } from "@/src/services/usecases/get-job";
 import { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
 import { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
 import { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
@@ -55,6 +56,9 @@ async function buildUseCases() {
     }),
     getApplication: createGetApplicationUseCase({
       applicationRepository: repositories.applicationRepository,
+    }),
+    getJob: createGetJobUseCase({
+      jobRepository: repositories.jobRepository,
     }),
     listApplicationLogs: createListApplicationLogsUseCase({
       applicationLogRepository: repositories.applicationLogRepository,
