@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
-type ingestSource = "all" | "Remotive" | "WWR" | "Web3";
+type ingestSource = "all" | "Remotive" | "WWR" | "Web3" | "Remote OK";
 
 type ingestPayload = {
   ok: boolean;
@@ -150,6 +150,7 @@ export default function IngestDialog() {
                     <SelectItem value="Remotive">Remotive</SelectItem>
                     <SelectItem value="WWR">WWR</SelectItem>
                     <SelectItem value="Web3">Web3</SelectItem>
+                    <SelectItem value="Remote OK">Remote OK</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
