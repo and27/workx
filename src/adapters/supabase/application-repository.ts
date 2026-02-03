@@ -63,7 +63,9 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
   async list(query: listApplicationsQuery) {
     let builder = supabase
       .from("applications")
-      .select("*")
+      .select(
+        "id,company,role,status,priority,next_action_at,source,notes,created_at,updated_at,job_id"
+      )
       .order("updated_at", { ascending: false });
     const search = query.search?.trim();
     if (search) {
@@ -90,7 +92,9 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
   async getById(query: { id: string }) {
     const { data, error } = await supabase
       .from("applications")
-      .select("*")
+      .select(
+        "id,company,role,status,priority,next_action_at,source,notes,created_at,updated_at,job_id"
+      )
       .eq("id", query.id)
       .maybeSingle();
 
