@@ -8,30 +8,33 @@ export type inboxGroups = {
   upcoming: application[];
 };
 
+export const buildInboxGroups = (items: application[]): inboxGroups => {
+  const today = todayDateOnly();
+  return items.reduce<inboxGroups>(
+    (groups, item) => {
+      if (item.status === "archived") {
+        return groups;
+      }
+      if (!item.nextActionAt) {
+        return groups;
+      }
+      const comparison = compareDateOnly(item.nextActionAt, today);
+      if (comparison < 0) {
+        groups.overdue.push(item);
+      } else if (comparison === 0) {
+        groups.today.push(item);
+      } else {
+        groups.upcoming.push(item);
+      }
+      return groups;
+    },
+    { overdue: [], today: [], upcoming: [] }
+  );
+};
+
 export const createListInboxUseCase =
   (dependencies: { applicationRepository: applicationRepository }) =>
   async (): Promise<inboxGroups> => {
     const items = await dependencies.applicationRepository.list({});
-    const today = todayDateOnly();
-
-    return items.reduce<inboxGroups>(
-      (groups, item) => {
-        if (item.status === "archived") {
-          return groups;
-        }
-        if (!item.nextActionAt) {
-          return groups;
-        }
-        const comparison = compareDateOnly(item.nextActionAt, today);
-        if (comparison < 0) {
-          groups.overdue.push(item);
-        } else if (comparison === 0) {
-          groups.today.push(item);
-        } else {
-          groups.upcoming.push(item);
-        }
-        return groups;
-      },
-      { overdue: [], today: [], upcoming: [] }
-    );
+    return buildInboxGroups(items);
   };

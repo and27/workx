@@ -39,6 +39,7 @@ export type jobUpsertResult = {
 
 export interface jobRepository {
   list(query: listJobsQuery): Promise<job[]>;
+  listSources(): Promise<string[]>;
   getById(query: { id: string }): Promise<job | null>;
   upsertByExternalId(input: {
     jobs: jobUpsertRecord[];

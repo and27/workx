@@ -34,7 +34,7 @@ const parsePositiveInt = (value?: string) => {
 const getSortDate = (record: job) => record.publishedAt ?? null;
 
 export default async function JobsPage({ searchParams }: jobsPageProps) {
-  const { listApplications, listJobs } = await getUseCases();
+  const { listApplications, listJobs, listJobSources } = await getUseCases();
   const params = (await searchParams) ?? {};
   const search = params.q?.trim() ?? "";
   const rawSource = params.source;
@@ -53,14 +53,14 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
       ? triageValue
       : undefined;
 
-  const [jobs, allJobs, applications] = await Promise.all([
+  const [jobs, sources, applications] = await Promise.all([
     listJobs({
       search: search || undefined,
       source,
       triageStatus,
       needsRetriage,
     }),
-    listJobs(),
+    listJobSources(),
     listApplications(),
   ]);
   const sortedJobs =
@@ -91,7 +91,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
     .map((application) => application.jobId)
     .filter((jobId): jobId is string => Boolean(jobId));
 
-  const sources = Array.from(new Set(allJobs.map((job) => job.source))).sort();
+  const sortedSources = [...new Set(sources)].sort();
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -110,7 +110,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
       <section className="rounded-lg border border-border bg-card">
         <div className="flex flex-wrap items-end gap-3 border-b border-border px-4 py-3">
           <JobsFilters
-            sources={sources}
+            sources={sortedSources}
             initialSearch={search}
             initialSource={rawSource ?? "all"}
             initialTriage={triageValue}

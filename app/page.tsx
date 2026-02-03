@@ -7,13 +7,13 @@ import { formatDate } from "@/src/lib/format";
 import JobTable from "@/src/components/JobTable";
 
 export default async function Home() {
-  const { listInbox, listApplications, listJobs, listApplicationLogs } =
+  const { listInboxOverview, listJobs, listApplicationLogs } =
     await getUseCases();
-  const [{ overdue }, applications, jobs] = await Promise.all([
-    listInbox(),
-    listApplications(),
+  const [{ inbox, applications }, jobs] = await Promise.all([
+    listInboxOverview(),
     listJobs(),
   ]);
+  const { overdue } = inbox;
   const totalApplications = applications.length;
   const activeInterviews = applications.filter(
     (item) => item.status === "screen" || item.status === "tech"

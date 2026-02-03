@@ -109,6 +109,9 @@ export const createMemoryJobRepository = (
       return true;
     });
   },
+  async listSources() {
+    return Array.from(new Set(store.jobs.map((record) => record.source)));
+  },
   async getById(query: { id: string }) {
     return store.jobs.find((record) => record.id === query.id) ?? null;
   },
