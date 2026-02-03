@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getUseCases } from "@/src/composition/usecases";
-import { HOME_CACHE_TAG } from "@/src/lib/cache-tags";
+import { HOME_CACHE_PROFILE, HOME_CACHE_TAG } from "@/src/lib/cache-tags";
 
 type triageMode = "new" | "recent";
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     revalidatePath("/jobs");
     revalidatePath("/");
-    revalidateTag(HOME_CACHE_TAG);
+    revalidateTag(HOME_CACHE_TAG, HOME_CACHE_PROFILE);
 
     return NextResponse.json({ ok: true, ...result.value });
   } catch (error) {
