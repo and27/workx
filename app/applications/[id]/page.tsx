@@ -152,10 +152,10 @@ export default async function ApplicationDetailPage({
           <Badge variant="outline">{logs.length} eventos</Badge>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <ol className="relative border-l border-border pl-6">
+          <ol className="relative border-l border-border pl-8">
             {logs.map((entry) => (
               <li key={entry.id} className="relative pb-6 last:pb-0">
-                <span className="absolute -left-[7px] top-1.5 flex size-3 items-center justify-center rounded-full border border-border bg-background" />
+                <span className="absolute -left-[7px] top-1.5 flex size-3 items-center justify-center rounded-full border border-border bg-foreground" />
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm font-medium">{entry.message}</p>
                   <span className="text-xs text-muted-foreground">

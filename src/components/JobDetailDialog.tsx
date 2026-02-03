@@ -116,7 +116,7 @@ export default function JobDetailDialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      className="h-full w-full bg-transparent p-0 text-foreground backdrop:bg-black/40"
+      className="fixed inset-0 h-full w-full bg-transparent p-0 text-foreground backdrop:bg-black/40"
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -127,8 +127,8 @@ export default function JobDetailDialog({
         }
       }}
     >
-      <div className="flex h-full items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-lg border border-border bg-background p-0 text-foreground shadow-xl">
+      <div className="flex h-full items-start justify-center overflow-y-auto p-4">
+        <div className="flex w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background p-0 text-foreground shadow-xl max-h-[calc(100vh-2rem)]">
           <div className="flex items-start justify-between gap-4 border-b border-border p-4">
             <div className="space-y-1">
               <h2 id={titleId} className="text-lg font-semibold">
@@ -146,7 +146,7 @@ export default function JobDetailDialog({
             </Button>
           </div>
 
-          <div className="space-y-4 p-4">
+          <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="flex flex-wrap gap-2">
               {activeJob.tags.map((tag) => (
                 <Badge key={tag} variant="outline">
