@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -53,6 +55,9 @@ export default function JobTable({
   action,
   variant,
 }: jobTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const savedSet = useMemo(() => new Set(savedJobIds), [savedJobIds]);
   const selectedJob = useMemo(
@@ -64,6 +69,34 @@ export default function JobTable({
   const handleClose = () => setActiveJobId(null);
 
   const emptyColSpan = variant === "home" ? 5 : 7;
+  const sortKey = searchParams.get("sort");
+  const sortOrder = searchParams.get("order") === "asc" ? "asc" : "desc";
+  const isPublishedSort = sortKey === "publishedAt";
+  const ariaSort =
+    variant === "list"
+      ? isPublishedSort
+        ? sortOrder === "asc"
+          ? "ascending"
+          : "descending"
+        : "none"
+      : undefined;
+
+  const handlePublishedSort = () => {
+    if (variant !== "list") return;
+    const params = new URLSearchParams(searchParams.toString());
+    const nextOrder = !isPublishedSort
+      ? "desc"
+      : sortOrder === "desc"
+        ? "asc"
+        : "desc";
+    params.set("sort", "publishedAt");
+    params.set("order", nextOrder);
+    params.delete("page");
+    const query = params.toString();
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, {
+      scroll: false,
+    });
+  };
 
   return (
     <>
@@ -78,7 +111,28 @@ export default function JobTable({
                 <TableHead>Senioridad</TableHead>
               </>
             )}
-            <TableHead>Publicado</TableHead>
+            <TableHead aria-sort={ariaSort}>
+              {variant === "list" ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                  onClick={handlePublishedSort}
+                >
+                  <span>Publicado</span>
+                  {isPublishedSort ? (
+                    sortOrder === "asc" ? (
+                      <ArrowUp className="size-3.5" />
+                    ) : (
+                      <ArrowDown className="size-3.5" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="size-3.5" />
+                  )}
+                </button>
+              ) : (
+                "Publicado"
+              )}
+            </TableHead>
             {variant === "list" && <TableHead>Fuente</TableHead>}
             {variant === "home" && <TableHead>Fuente</TableHead>}
             {variant === "list" && <TableHead>Tags</TableHead>}
