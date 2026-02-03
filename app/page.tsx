@@ -2,17 +2,20 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { saveJobAction } from "@/app/jobs/actions";
 import { getUseCases } from "@/src/composition/usecases";
-
 import { formatDate } from "@/src/lib/format";
 import JobTable from "@/src/components/JobTable";
 
+const HOME_JOBS_LIMIT = 5;
+const HOME_LOGS_LIMIT = 6;
+
 export default async function Home() {
-  const { listInboxOverview, listJobs, listApplicationLogs } =
+  const { listInboxOverview, listJobsPage, listApplicationLogs } =
     await getUseCases();
-  const [{ inbox, applications }, jobs] = await Promise.all([
+  const [{ inbox, applications }, jobsPage] = await Promise.all([
     listInboxOverview(),
-    listJobs(),
+    listJobsPage({ page: 1, pageSize: HOME_JOBS_LIMIT }),
   ]);
+  const jobs = jobsPage.items;
   const { overdue } = inbox;
   const totalApplications = applications.length;
   const activeInterviews = applications.filter(
@@ -31,12 +34,23 @@ export default async function Home() {
     return diffDays <= 7;
   }).length;
 
-  const savedJobIds = applications
-    .map((application) => application.jobId)
-    .filter((jobId): jobId is string => Boolean(jobId));
+  const visibleJobIds = new Set(jobs.map((job) => job.id));
+  const savedJobIds = Array.from(
+    new Set(
+      applications
+        .map((application) => application.jobId)
+        .filter(
+          (jobId): jobId is string =>
+            Boolean(jobId) && visibleJobIds.has(jobId)
+        )
+    )
+  );
   const recentLogs =
     applications.length > 0
-      ? await listApplicationLogs({ applicationId: applications[0].id })
+      ? await listApplicationLogs({
+          applicationId: applications[0].id,
+          limit: HOME_LOGS_LIMIT,
+        })
       : [];
 
   return (
@@ -96,7 +110,7 @@ export default async function Home() {
         </div>
         <div className="overflow-hidden rounded-lg border border-border">
           <JobTable
-            jobs={jobs.slice(0, 5)}
+            jobs={jobs}
             savedJobIds={savedJobIds}
             action={saveJobAction}
             variant="home"
@@ -111,7 +125,7 @@ export default async function Home() {
         </div>
         <div className="rounded-lg border border-border">
           <ul className="divide-y divide-border text-sm">
-            {recentLogs.slice(0, 6).map((entry) => (
+            {recentLogs.map((entry) => (
               <li key={entry.id} className="px-4 py-3">
                 <p className="text-sm">{entry.message}</p>
                 <p className="text-xs text-muted-foreground">
