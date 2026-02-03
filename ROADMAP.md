@@ -195,7 +195,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
-## Phase 3.2 – Curation & Manual Capture (Producto) 🟡 Planned
+## Phase 3.2 – Curation & Manual Capture (Producto) ✅
 
 **Goal:** Improve curation quality and capture off-source opportunities without breaking the existing triage flow.
 
@@ -218,6 +218,11 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 - Shortlist is ordered by rank score with an explainable reason.
 - Manual jobs can be created and optionally triaged.
 - Ranking respects triage status (only `shortlist` is ranked).
+
+**Status update (2026-02-03):**
+- ✅ Ranking for shortlist jobs (0–100 + reason).
+- ✅ Provider selection via env.
+- ✅ Manual job capture page + optional auto-triage.
 
 ---
 
