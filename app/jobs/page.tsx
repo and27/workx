@@ -31,8 +31,7 @@ const parsePositiveInt = (value?: string) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 };
 
-const getSortDate = (record: job) =>
-  record.publishedAt ?? record.createdAt ?? record.updatedAt ?? null;
+const getSortDate = (record: job) => record.publishedAt ?? null;
 
 export default async function JobsPage({ searchParams }: jobsPageProps) {
   const { listApplications, listJobs } = await getUseCases();
