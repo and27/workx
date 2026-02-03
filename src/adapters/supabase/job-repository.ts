@@ -162,17 +162,17 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     if (orderBy === "publishedAt") {
       builder = builder.order("published_at", {
         ascending: query.order === "asc",
-        nullsLast: true,
+        nullsFirst: false,
       });
       builder = builder.order("updated_at", { ascending: false });
     } else if (orderBy === "rankScore") {
       builder = builder.order("rank_score", {
         ascending: false,
-        nullsLast: true,
+        nullsFirst: false,
       });
       builder = builder.order("published_at", {
         ascending: false,
-        nullsLast: true,
+        nullsFirst: false,
       });
       builder = builder.order("updated_at", { ascending: false });
     } else {
