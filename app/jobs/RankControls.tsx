@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { emitRankStatus } from "@/src/lib/rank-status";
 
 type rankPayload = {
   ok: boolean;
@@ -57,6 +58,7 @@ export default function RankControls() {
     }
 
     setPending(true);
+    emitRankStatus(true);
     try {
       const response = await fetch("/api/rank/shortlist", {
         method: "POST",
@@ -91,6 +93,7 @@ export default function RankControls() {
       });
     } finally {
       setPending(false);
+      emitRankStatus(false);
     }
   };
 
