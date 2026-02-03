@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ApplicationsFilters from "@/src/components/ApplicationsFilters";
 import {
