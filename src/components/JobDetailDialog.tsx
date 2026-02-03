@@ -116,7 +116,7 @@ export default function JobDetailDialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      className="w-full max-w-2xl rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/40"
+      className="h-full w-full bg-transparent p-0 text-foreground backdrop:bg-black/40"
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -127,92 +127,97 @@ export default function JobDetailDialog({
         }
       }}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-border p-4">
-        <div className="space-y-1">
-          <h2 id={titleId} className="text-lg font-semibold">
-            {activeJob.role}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {activeJob.company} • {activeJob.location}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {activeJob.seniority} • {activeJob.source} • {publishedText}
-          </p>
-        </div>
-        <Button type="button" variant="outline" size="sm" onClick={onClose}>
-          Cerrar
-        </Button>
-      </div>
-
-      <div className="space-y-4 p-4">
-        <div className="flex flex-wrap gap-2">
-          {activeJob.tags.map((tag) => (
-            <Badge key={tag} variant="outline">
-              {tag}
-            </Badge>
-          ))}
-          {activeJob.tags.length === 0 && (
-            <span className="text-xs text-muted-foreground">Sin tags</span>
-          )}
-        </div>
-
-        {(activeJob.triageStatus || activeJob.triageReasons?.length) && (
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold">Razones del triage</h3>
-            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-              {activeJob.triageReasons && activeJob.triageReasons.length > 0 ? (
-                <ul className="list-disc space-y-1 pl-4">
-                  {activeJob.triageReasons.map((reason) => (
-                    <li key={reason}>{reason}</li>
-                  ))}
-                </ul>
-              ) : (
-                <span>Sin razones registradas.</span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {(activeJob.rankScore !== null || activeJob.rankReason) && (
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold">Ranking</h3>
-            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-              <p>
-                {activeJob.rankScore !== null
-                  ? `Score ${activeJob.rankScore}/100`
-                  : "Sin score"}
+      <div className="flex h-full items-center justify-center p-4">
+        <div className="w-full max-w-2xl rounded-lg border border-border bg-background p-0 text-foreground shadow-xl">
+          <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+            <div className="space-y-1">
+              <h2 id={titleId} className="text-lg font-semibold">
+                {activeJob.role}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {activeJob.company} • {activeJob.location}
               </p>
-              {activeJob.rankReason && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {activeJob.rankReason}
-                </p>
+              <p className="text-xs text-muted-foreground">
+                {activeJob.seniority} • {activeJob.source} • {publishedText}
+              </p>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+              Cerrar
+            </Button>
+          </div>
+
+          <div className="space-y-4 p-4">
+            <div className="flex flex-wrap gap-2">
+              {activeJob.tags.map((tag) => (
+                <Badge key={tag} variant="outline">
+                  {tag}
+                </Badge>
+              ))}
+              {activeJob.tags.length === 0 && (
+                <span className="text-xs text-muted-foreground">Sin tags</span>
               )}
             </div>
-          </div>
-        )}
 
-        <div className="space-y-2">
-          <h3 className="text-sm font-semibold">Descripcion</h3>
-          <div
-            id={descriptionId}
-            className="max-h-64 overflow-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground"
-          >
-            {description}
+            {(activeJob.triageStatus || activeJob.triageReasons?.length) && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Razones del triage</h3>
+                <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                  {activeJob.triageReasons &&
+                  activeJob.triageReasons.length > 0 ? (
+                    <ul className="list-disc space-y-1 pl-4">
+                      {activeJob.triageReasons.map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span>Sin razones registradas.</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {(activeJob.rankScore !== null || activeJob.rankReason) && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Ranking</h3>
+                <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                  <p>
+                    {activeJob.rankScore !== null
+                      ? `Score ${activeJob.rankScore}/100`
+                      : "Sin score"}
+                  </p>
+                  {activeJob.rankReason && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {activeJob.rankReason}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold">Descripcion</h3>
+              <div
+                id={descriptionId}
+                className="max-h-64 overflow-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground"
+              >
+                {description}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
+            <div className="flex items-center gap-2">
+              <JobSaveForm jobId={activeJob.id} saved={saved} action={action} />
+            </div>
+            {activeJob.sourceUrl && (
+              <Button asChild variant="outline" size="sm">
+                <a href={activeJob.sourceUrl} target="_blank" rel="noopener">
+                  Abrir vacante
+                </a>
+              </Button>
+            )}
           </div>
         </div>
-      </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
-          <div className="flex items-center gap-2">
-            <JobSaveForm jobId={activeJob.id} saved={saved} action={action} />
-          </div>
-        {activeJob.sourceUrl && (
-          <Button asChild variant="outline" size="sm">
-            <a href={activeJob.sourceUrl} target="_blank" rel="noopener">
-              Abrir vacante
-            </a>
-          </Button>
-        )}
       </div>
     </dialog>
   );

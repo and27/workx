@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ApplicationsFilters from "@/src/components/ApplicationsFilters";
+import ApplicationAgentActions from "@/src/components/ApplicationAgentActions";
 import {
   Table,
   TableBody,
@@ -67,6 +68,7 @@ export default async function ApplicationsPage({
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
+              <TableHead>Acciones</TableHead>
               <TableHead>Empresa</TableHead>
               <TableHead>Rol</TableHead>
               <TableHead>Estado</TableHead>
@@ -79,6 +81,9 @@ export default async function ApplicationsPage({
           <TableBody>
             {applications.map((item) => (
               <TableRow key={item.id}>
+                <TableCell>
+                  <ApplicationAgentActions jobId={item.jobId} />
+                </TableCell>
                 <TableCell>
                   <span
                     className="block max-w-[180px] truncate"
@@ -116,7 +121,7 @@ export default async function ApplicationsPage({
             {applications.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="py-6 text-center text-sm text-muted-foreground"
                 >
                   Sin postulaciones para mostrar.
