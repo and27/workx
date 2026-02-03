@@ -14,6 +14,10 @@ create table if not exists public.jobs (
   triaged_at timestamptz null,
   triage_provider text null,
   triage_version integer null,
+  rank_score integer null,
+  rank_reason text null,
+  rank_provider text null,
+  rank_version integer null,
   published_at timestamptz null,
   created_at timestamptz not null,
   updated_at timestamptz not null

@@ -5,6 +5,7 @@ import { triageProvider } from "@/src/domain/types/triage-provider";
 import { triageStatus } from "@/src/domain/types/triage-status";
 import {
   jobRepository,
+  jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
@@ -26,6 +27,10 @@ type jobRow = {
   triaged_at: string | null;
   triage_provider: string | null;
   triage_version: number | null;
+  rank_score: number | string | null;
+  rank_reason: string | null;
+  rank_provider: string | null;
+  rank_version: number | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -47,6 +52,10 @@ const toJob = (row: jobRow): job => ({
   triagedAt: row.triaged_at ?? null,
   triageProvider: toTriageProvider(row.triage_provider),
   triageVersion: row.triage_version ?? null,
+  rankScore: toRankScore(row.rank_score),
+  rankReason: row.rank_reason ?? null,
+  rankProvider: toTriageProvider(row.rank_provider),
+  rankVersion: row.rank_version ?? null,
   publishedAt: row.published_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -64,6 +73,13 @@ const toTriageProvider = (value: string | null): triageProvider | null => {
     return value;
   }
   return null;
+};
+
+const toRankScore = (value: number | string | null): number | null => {
+  if (value === null || value === undefined) return null;
+  const numeric = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  return Math.min(100, Math.max(0, Math.round(numeric)));
 };
 
 const toUpsertRow = (record: jobUpsertRecord, now: string) => ({
@@ -85,7 +101,7 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     let builder = supabase
       .from("jobs")
       .select(
-        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,published_at,created_at,updated_at"
+        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,rank_score,rank_reason,rank_provider,rank_version,published_at,created_at,updated_at"
       )
       .order("updated_at", { ascending: false });
     const search = query.search?.trim();
@@ -133,7 +149,7 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     const { data, error } = await supabase
       .from("jobs")
       .select(
-        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,published_at,created_at,updated_at"
+        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,rank_score,rank_reason,rank_provider,rank_version,published_at,created_at,updated_at"
       )
       .eq("id", query.id)
       .maybeSingle();
@@ -227,6 +243,28 @@ export const createSupabaseJobRepository = (): jobRepository => ({
         triage_provider: input.patch.triageProvider,
         triage_version: input.patch.triageVersion,
         updated_at: input.patch.triagedAt ?? new Date().toISOString(),
+      })
+      .eq("id", input.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    if (!data) {
+      throw new Error(`Job not found: ${input.id}`);
+    }
+    return toJob(data as jobRow);
+  },
+  async updateRank(input: { id: string; patch: jobRankUpdate }) {
+    const { data, error } = await supabase
+      .from("jobs")
+      .update({
+        rank_score: input.patch.rankScore,
+        rank_reason: input.patch.rankReason,
+        rank_provider: input.patch.rankProvider,
+        rank_version: input.patch.rankVersion,
+        updated_at: new Date().toISOString(),
       })
       .eq("id", input.id)
       .select("*")

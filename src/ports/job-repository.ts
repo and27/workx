@@ -32,6 +32,13 @@ export type jobTriageUpdate = {
   triageVersion: number | null;
 };
 
+export type jobRankUpdate = {
+  rankScore: number | null;
+  rankReason: string | null;
+  rankProvider: triageProvider | null;
+  rankVersion: number | null;
+};
+
 export type jobUpsertResult = {
   created: number;
   updated: number;
@@ -46,4 +53,5 @@ export interface jobRepository {
     now: isoDateTime;
   }): Promise<jobUpsertResult>;
   updateTriage(input: { id: string; patch: jobTriageUpdate }): Promise<job>;
+  updateRank(input: { id: string; patch: jobRankUpdate }): Promise<job>;
 }

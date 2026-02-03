@@ -6,6 +6,7 @@ import JobTable from "@/src/components/JobTable";
 import JobsPagination from "@/src/components/JobsPagination";
 import JobsTriageStatus from "@/src/components/JobsTriageStatus";
 import TriageControls from "@/app/jobs/TriageControls";
+import RankControls from "@/app/jobs/RankControls";
 
 type jobsPageProps = {
   searchParams?: Promise<{
@@ -88,6 +89,7 @@ export default async function JobsPage({ searchParams }: jobsPageProps) {
         <div className="flex items-center gap-2">
           <IngestDialog />
           <TriageControls />
+          <RankControls />
         </div>
       </header>
 
