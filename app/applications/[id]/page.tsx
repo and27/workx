@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/src/lib/format";
 import { getUseCases } from "@/src/composition/usecases";
+import ApplicationJobDetail from "@/src/components/ApplicationJobDetail";
 import {
   priorityOptions,
   statusOptions,
@@ -28,12 +29,16 @@ type applicationDetailProps = {
 export default async function ApplicationDetailPage({
   params,
 }: applicationDetailProps) {
-  const { listApplicationLogs, getApplication } = await getUseCases();
+  const { listApplicationLogs, getApplication, getJob } = await getUseCases();
   const routeParams = await params;
   const application = await getApplication({ id: routeParams.id });
   if (!application) {
     notFound();
   }
+
+  const job = application.jobId
+    ? await getJob({ id: application.jobId })
+    : null;
 
   const logs = await listApplicationLogs({ applicationId: application.id });
 
@@ -104,6 +109,18 @@ export default async function ApplicationDetailPage({
               />
             </div>
           </div>
+
+          {job && (
+            <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 p-3">
+              <div>
+                <p className="text-sm font-medium">Vacante asociada</p>
+                <p className="text-xs text-muted-foreground">
+                  {job.role} · {job.company}
+                </p>
+              </div>
+              <ApplicationJobDetail job={job} saved={Boolean(application.jobId)} />
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground" htmlFor="notes">
