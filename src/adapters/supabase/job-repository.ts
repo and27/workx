@@ -5,6 +5,7 @@ import { triageProvider } from "@/src/domain/types/triage-provider";
 import { triageStatus } from "@/src/domain/types/triage-status";
 import {
   jobRepository,
+  jobCreateRecord,
   jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
@@ -96,6 +97,21 @@ const toUpsertRow = (record: jobUpsertRecord, now: string) => ({
   updated_at: now,
 });
 
+const toCreateRow = (record: jobCreateRecord, now: string) => ({
+  company: record.company,
+  role: record.role,
+  source: record.source,
+  source_url: record.sourceUrl,
+  external_id: record.externalId,
+  location: record.location,
+  seniority: record.seniority,
+  tags: record.tags,
+  description: record.description,
+  published_at: record.publishedAt,
+  created_at: now,
+  updated_at: now,
+});
+
 export const createSupabaseJobRepository = (): jobRepository => ({
   async list(query: listJobsQuery) {
     let builder = supabase
@@ -158,6 +174,26 @@ export const createSupabaseJobRepository = (): jobRepository => ({
       throw new Error(error.message);
     }
     return data ? toJob(data as jobRow) : null;
+  },
+  async create(input: { job: jobCreateRecord; now: string }) {
+    const { data, error } = await supabase
+      .from("jobs")
+      .insert({
+        id: randomUUID(),
+        ...toCreateRow(input.job, input.now),
+      })
+      .select(
+        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,rank_score,rank_reason,rank_provider,rank_version,published_at,created_at,updated_at"
+      )
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    if (!data) {
+      throw new Error("Job not created.");
+    }
+    return toJob(data as jobRow);
   },
   async upsertByExternalId(input: { jobs: jobUpsertRecord[]; now: string }) {
     if (input.jobs.length === 0) {

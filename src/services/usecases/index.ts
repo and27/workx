@@ -28,6 +28,11 @@ export type {
   createApplicationFromJobDeps,
 } from "@/src/services/usecases/create-application-from-job";
 export type {
+  createManualJobInput,
+  createManualJobDeps,
+  createManualJobOutput,
+} from "@/src/services/usecases/create-manual-job";
+export type {
   updateApplicationInput,
   updateApplicationDeps,
 } from "@/src/services/usecases/update-application";
@@ -50,6 +55,7 @@ export { createGetApplicationUseCase } from "@/src/services/usecases/get-applica
 export { createGetJobUseCase } from "@/src/services/usecases/get-job";
 export { createListApplicationLogsUseCase } from "@/src/services/usecases/list-application-logs";
 export { createApplicationFromJobUseCase } from "@/src/services/usecases/create-application-from-job";
+export { createManualJobUseCase } from "@/src/services/usecases/create-manual-job";
 export { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 export { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
 export { ok, err } from "@/src/services/usecases/result";

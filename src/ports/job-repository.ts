@@ -24,6 +24,19 @@ export type jobUpsertRecord = {
   publishedAt: isoDateTime | null;
 };
 
+export type jobCreateRecord = {
+  source: string;
+  role: string;
+  company: string;
+  location: string;
+  seniority: string;
+  tags: string[];
+  description: string | null;
+  sourceUrl: string | null;
+  externalId: string | null;
+  publishedAt: isoDateTime | null;
+};
+
 export type jobTriageUpdate = {
   triageStatus: triageStatus | null;
   triageReasons: string[] | null;
@@ -48,6 +61,7 @@ export interface jobRepository {
   list(query: listJobsQuery): Promise<job[]>;
   listSources(): Promise<string[]>;
   getById(query: { id: string }): Promise<job | null>;
+  create(input: { job: jobCreateRecord; now: isoDateTime }): Promise<job>;
   upsertByExternalId(input: {
     jobs: jobUpsertRecord[];
     now: isoDateTime;

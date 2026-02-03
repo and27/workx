@@ -9,6 +9,7 @@ export type {
 } from "@/src/ports/application-log-repository";
 export type {
   jobRepository,
+  jobCreateRecord,
   jobRankUpdate,
   jobUpsertRecord,
   jobUpsertResult,
