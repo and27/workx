@@ -157,7 +157,7 @@ export default async function ApplicationDetailPage({
           <ol className="relative border-l border-border pl-10">
             {logs.map((entry) => (
               <li key={entry.id} className="relative pb-6 last:pb-0">
-                <span className="absolute -left-1.5 top-1.5 flex size-3 items-center justify-center rounded-full border border-border bg-foreground" />
+                <span className="absolute -left-5 top-1.5 flex size-3 items-center justify-center rounded-full border border-foreground bg-muted" />
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm font-medium">{entry.message}</p>
                   <span className="text-xs text-muted-foreground">

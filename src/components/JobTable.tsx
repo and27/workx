@@ -25,6 +25,7 @@ import JobDetailDialog from "@/src/components/JobDetailDialog";
 import type { job } from "@/src/domain/entities/job";
 import { formatRelativeDate } from "@/src/lib/format";
 import type { saveJobState } from "@/app/jobs/actions";
+import { Button } from "@/components/ui/button";
 
 type jobTableVariant = "home" | "list";
 
@@ -173,19 +174,34 @@ export default function JobTable({
                       saved={savedSet.has(job.id)}
                       action={action}
                     />
-                    {variant === "list" && job.sourceUrl && (
-                      <Button asChild variant="outline" size="icon-sm">
-                        <a
-                          href={job.sourceUrl}
-                          target="_blank"
-                          rel="noopener"
-                          aria-label="Abrir vacante"
-                          title="Abrir vacante"
-                          onClick={stopRowClick}
-                          onKeyDown={stopRowClick}
-                        >
-                          <ExternalLink />
-                        </a>
+                    {variant === "list" && (
+                      <Button
+                        asChild={Boolean(job.sourceUrl)}
+                        variant="outline"
+                        size="icon-sm"
+                        disabled={!job.sourceUrl}
+                        title={
+                          job.sourceUrl ? "Abrir vacante" : "Sin link de vacante"
+                        }
+                        aria-label={
+                          job.sourceUrl ? "Abrir vacante" : "Sin link de vacante"
+                        }
+                      >
+                        {job.sourceUrl ? (
+                          <a
+                            href={job.sourceUrl}
+                            target="_blank"
+                            rel="noopener"
+                            onClick={stopRowClick}
+                            onKeyDown={stopRowClick}
+                          >
+                            <ExternalLink />
+                          </a>
+                        ) : (
+                          <span>
+                            <ExternalLink />
+                          </span>
+                        )}
                       </Button>
                     )}
                   </div>
