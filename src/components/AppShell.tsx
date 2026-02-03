@@ -8,7 +8,7 @@ const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/applications", label: "Postulaciones" },
   { href: "/jobs", label: "Trabajos" },
-  { href: "/manual", label: "Ingesta manual" },
+  { href: "/manual", label: "Crear job" },
   { href: "/inbox", label: "Inbox" },
 ];
 

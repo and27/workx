@@ -177,7 +177,7 @@ export default function IngestDialog() {
                   onClick={handleClose}
                   className="font-medium text-foreground hover:underline"
                 >
-                  Ir a ingesta manual
+                  Ir a crear job
                 </Link>
               </p>
             </div>
