@@ -4,7 +4,13 @@ import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  RefreshCw,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -246,9 +252,9 @@ export default function JobTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="max-w-40">
+                <TableCell className="max-w-40 overflow-hidden">
                   <div className="space-y-1">
-                    <div className="font-medium">{job.company}</div>
+                    <div className="font-medium truncate">{job.company}</div>
                     <div className="text-xs text-muted-foreground truncate">
                       {job.location}
                     </div>
