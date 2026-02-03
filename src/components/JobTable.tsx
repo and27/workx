@@ -4,7 +4,14 @@ import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ExternalLink,
+  RefreshCw,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -160,11 +167,28 @@ export default function JobTable({
                 }}
               >
                 <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
-                  <JobSaveForm
-                    jobId={job.id}
-                    saved={savedSet.has(job.id)}
-                    action={action}
-                  />
+                  <div className="flex items-center gap-2">
+                    <JobSaveForm
+                      jobId={job.id}
+                      saved={savedSet.has(job.id)}
+                      action={action}
+                    />
+                    {variant === "list" && job.sourceUrl && (
+                      <Button asChild variant="outline" size="icon-sm">
+                        <a
+                          href={job.sourceUrl}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label="Abrir vacante"
+                          title="Abrir vacante"
+                          onClick={stopRowClick}
+                          onKeyDown={stopRowClick}
+                        >
+                          <ExternalLink />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="font-medium max-w-xs overflow-hidden">
                   <div className="space-y-0">
