@@ -9,49 +9,38 @@ const HOME_JOBS_LIMIT = 5;
 const HOME_LOGS_LIMIT = 6;
 
 export default async function Home() {
-  const { listInboxOverview, listJobsPage, listApplicationLogs } =
+  const { listHomeOverview, listJobsPage, listApplicationLogs, listApplications } =
     await getUseCases();
-  const [{ inbox, applications }, jobsPage] = await Promise.all([
-    listInboxOverview(),
+  const [overview, jobsPage] = await Promise.all([
+    listHomeOverview(),
     listJobsPage({ page: 1, pageSize: HOME_JOBS_LIMIT }),
   ]);
   const jobs = jobsPage.items;
-  const { overdue } = inbox;
-  const totalApplications = applications.length;
-  const activeInterviews = applications.filter(
-    (item) => item.status === "screen" || item.status === "tech"
-  ).length;
-  const overdueCount = overdue.length;
-  const thisWeek = applications.filter((item) => {
-    if (!item.updatedAt) {
-      return false;
-    }
-    const updated = new Date(item.updatedAt);
-    const now = new Date();
-    const diffDays = Math.floor(
-      (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    return diffDays <= 7;
-  }).length;
+  const {
+    totalApplications,
+    activeInterviews,
+    overdueCount,
+    thisWeek,
+    latestApplicationId,
+  } = overview;
 
-  const visibleJobIds = new Set(jobs.map((job) => job.id));
-  const savedJobIds = Array.from(
-    new Set(
-      applications
-        .map((application) => application.jobId)
-        .filter(
-          (jobId): jobId is string =>
-            Boolean(jobId) && visibleJobIds.has(jobId)
+  const jobIds = jobs.map((job) => job.id);
+  const savedJobIds =
+    jobIds.length > 0
+      ? Array.from(
+          new Set(
+            (await listApplications({ jobIds }))
+              .map((application) => application.jobId)
+              .filter((jobId): jobId is string => Boolean(jobId))
+          )
         )
-    )
-  );
-  const recentLogs =
-    applications.length > 0
-      ? await listApplicationLogs({
-          applicationId: applications[0].id,
-          limit: HOME_LOGS_LIMIT,
-        })
       : [];
+  const recentLogs = latestApplicationId
+    ? await listApplicationLogs({
+        applicationId: latestApplicationId,
+        limit: HOME_LOGS_LIMIT,
+      })
+    : [];
 
   return (
     <div className="space-y-8">

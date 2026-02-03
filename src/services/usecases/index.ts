@@ -1,5 +1,6 @@
 export type { inboxGroups } from "@/src/services/usecases/list-inbox";
 export type { inboxOverview } from "@/src/services/usecases/list-inbox-overview";
+export type { homeOverview } from "@/src/services/usecases/list-home-overview";
 export type { listApplicationsInput } from "@/src/services/usecases/list-applications";
 export type { listJobsInput } from "@/src/services/usecases/list-jobs";
 export type {
@@ -32,6 +33,7 @@ export type {
 export type { result, resultErr, resultOk } from "@/src/services/usecases/result";
 export { createListInboxUseCase } from "@/src/services/usecases/list-inbox";
 export { createListInboxOverviewUseCase } from "@/src/services/usecases/list-inbox-overview";
+export { createListHomeOverviewUseCase } from "@/src/services/usecases/list-home-overview";
 export { createListApplicationsUseCase } from "@/src/services/usecases/list-applications";
 export { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 export { createListJobsPageUseCase } from "@/src/services/usecases/list-jobs-page";
