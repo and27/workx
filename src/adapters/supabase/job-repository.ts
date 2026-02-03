@@ -68,7 +68,9 @@ export const createSupabaseJobRepository = (): jobRepository => ({
   async list(query: listJobsQuery) {
     let builder = supabase
       .from("jobs")
-      .select("*")
+      .select(
+        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,published_at,created_at,updated_at"
+      )
       .order("updated_at", { ascending: false });
     const search = query.search?.trim();
     if (search) {
@@ -99,7 +101,10 @@ export const createSupabaseJobRepository = (): jobRepository => ({
     return (data ?? []).map((row) => toJob(row as jobRow));
   },
   async listSources() {
-    const { data, error } = await supabase.from("jobs").select("source");
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("source")
+      .order("source", { ascending: true });
     if (error) {
       throw new Error(error.message);
     }
@@ -111,7 +116,9 @@ export const createSupabaseJobRepository = (): jobRepository => ({
   async getById(query: { id: string }) {
     const { data, error } = await supabase
       .from("jobs")
-      .select("*")
+      .select(
+        "id,company,role,source,source_url,external_id,location,seniority,tags,description,triage_status,triage_reasons,triaged_at,triage_provider,triage_version,published_at,created_at,updated_at"
+      )
       .eq("id", query.id)
       .maybeSingle();
 
