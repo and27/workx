@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Bookmark, Check, Loader2 } from "lucide-react";
 import type { saveJobState } from "@/app/jobs/actions";
 
 type jobSaveFormProps = {
@@ -22,9 +23,23 @@ type submitButtonProps = {
 const SubmitButton = ({ saved }: submitButtonProps) => {
   const { pending } = useFormStatus();
   const disabled = pending || saved;
+  const label = pending ? "Guardando" : saved ? "Guardada" : "Guardar";
   return (
-    <Button type="submit" variant="outline" size="sm" disabled={disabled}>
-      {pending ? "Guardando..." : saved ? "Guardada" : "Guardar"}
+    <Button
+      type="submit"
+      variant="outline"
+      size="icon-sm"
+      disabled={disabled}
+      title={label}
+    >
+      {pending ? (
+        <Loader2 className="animate-spin" />
+      ) : saved ? (
+        <Check />
+      ) : (
+        <Bookmark />
+      )}
+      <span className="sr-only">{label}</span>
     </Button>
   );
 };
