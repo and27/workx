@@ -123,6 +123,24 @@ export default function JobDetailDialog({
           </div>
         )}
 
+        {(job.rankScore !== null || job.rankReason) && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">Ranking</h3>
+            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+              <p>
+                {job.rankScore !== null
+                  ? `Score ${job.rankScore}/100`
+                  : "Sin score"}
+              </p>
+              {job.rankReason && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {job.rankReason}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <h3 className="text-sm font-semibold">Descripcion</h3>
           <div

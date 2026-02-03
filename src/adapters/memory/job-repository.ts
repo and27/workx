@@ -1,6 +1,8 @@
 import { job } from "@/src/domain/entities/job";
 import {
   jobRepository,
+  jobCreateRecord,
+  jobRankUpdate,
   jobTriageUpdate,
   jobUpsertRecord,
   listJobsQuery,
@@ -73,12 +75,49 @@ const applyUpsert = (
     triagedAt: null,
     triageProvider: null,
     triageVersion: null,
+    rankScore: null,
+    rankReason: null,
+    rankProvider: null,
+    rankVersion: null,
     publishedAt: record.publishedAt,
     createdAt: now,
     updatedAt: now,
   });
 
   return { created: true };
+};
+
+const applyCreate = (
+  store: memoryStore,
+  record: jobCreateRecord,
+  now: string
+): job => {
+  const created: job = {
+    id: createId(),
+    company: record.company,
+    role: record.role,
+    source: record.source,
+    sourceUrl: record.sourceUrl,
+    externalId: record.externalId,
+    location: record.location,
+    seniority: record.seniority,
+    tags: record.tags,
+    description: record.description,
+    triageStatus: null,
+    triageReasons: null,
+    triagedAt: null,
+    triageProvider: null,
+    triageVersion: null,
+    rankScore: null,
+    rankReason: null,
+    rankProvider: null,
+    rankVersion: null,
+    publishedAt: record.publishedAt,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.jobs.push(created);
+  return created;
 };
 
 export const createMemoryJobRepository = (
@@ -109,8 +148,14 @@ export const createMemoryJobRepository = (
       return true;
     });
   },
+  async listSources() {
+    return Array.from(new Set(store.jobs.map((record) => record.source)));
+  },
   async getById(query: { id: string }) {
     return store.jobs.find((record) => record.id === query.id) ?? null;
+  },
+  async create(input: { job: jobCreateRecord; now: string }) {
+    return applyCreate(store, input.job, input.now);
   },
   async upsertByExternalId(input: { jobs: jobUpsertRecord[]; now: string }) {
     const results = input.jobs.map((record) =>
@@ -132,6 +177,23 @@ export const createMemoryJobRepository = (
       triagedAt: input.patch.triagedAt,
       triageProvider: input.patch.triageProvider,
       triageVersion: input.patch.triageVersion,
+    };
+    store.jobs[index] = updated;
+    return updated;
+  },
+  async updateRank(input: { id: string; patch: jobRankUpdate }) {
+    const index = store.jobs.findIndex((record) => record.id === input.id);
+    if (index < 0) {
+      throw new Error(`Job not found: ${input.id}`);
+    }
+    const current = store.jobs[index];
+    const updated = {
+      ...current,
+      rankScore: input.patch.rankScore,
+      rankReason: input.patch.rankReason,
+      rankProvider: input.patch.rankProvider,
+      rankVersion: input.patch.rankVersion,
+      updatedAt: new Date().toISOString(),
     };
     store.jobs[index] = updated;
     return updated;

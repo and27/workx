@@ -9,6 +9,8 @@ export type {
 } from "@/src/ports/application-log-repository";
 export type {
   jobRepository,
+  jobCreateRecord,
+  jobRankUpdate,
   jobUpsertRecord,
   jobUpsertResult,
   listJobsQuery,
@@ -22,3 +24,4 @@ export type {
   jobTriageDecision,
   jobTriagePort,
 } from "@/src/ports/job-triage";
+export type { jobRankDecision, jobRankPort } from "@/src/ports/job-ranking";

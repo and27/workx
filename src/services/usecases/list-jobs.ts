@@ -6,6 +6,16 @@ export type listJobsInput = listJobsQuery & {
   needsRetriage?: boolean;
 };
 
+export type listJobsDeps = {
+  jobRepository: jobRepository;
+  profile: userProfile;
+};
+
+type listJobsPrepareInput = listJobsInput & {
+  page?: number;
+  pageSize?: number;
+};
+
 const triageRank = (value: job["triageStatus"]) => {
   if (value === "shortlist") return 0;
   if (value === "maybe") return 1;
@@ -13,30 +23,57 @@ const triageRank = (value: job["triageStatus"]) => {
   return 3;
 };
 
+const toRankScore = (value: job["rankScore"]) =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
+const toRecency = (record: job) =>
+  record.publishedAt ?? record.updatedAt;
+
 const getNeedsRetriage = (jobRecord: job, profileVersion: number) =>
   jobRecord.triageStatus !== null &&
   jobRecord.triageVersion !== profileVersion;
 
-export const createListJobsUseCase =
-  (dependencies: { jobRepository: jobRepository; profile: userProfile }) =>
-  async (input: listJobsInput = {}): Promise<job[]> => {
-    const { needsRetriage, ...repoQuery } = input;
-    const items = await dependencies.jobRepository.list(repoQuery);
-    const profileVersion = dependencies.profile.profileVersion;
-    const decorated = items.map((jobRecord) => ({
-      ...jobRecord,
-      needsRetriage: getNeedsRetriage(jobRecord, profileVersion),
-    }));
-    const filtered =
-      typeof needsRetriage === "boolean"
-        ? decorated.filter(
-            (jobRecord) => jobRecord.needsRetriage === needsRetriage
-          )
-        : decorated;
+export const prepareJobs = async (
+  dependencies: listJobsDeps,
+  input: listJobsPrepareInput = {}
+): Promise<job[]> => {
+  const { needsRetriage, page, pageSize, ...repoQuery } = input;
+  const items = await dependencies.jobRepository.list(repoQuery);
+  const profileVersion = dependencies.profile.profileVersion;
+  const decorated = items.map((jobRecord) => ({
+    ...jobRecord,
+    needsRetriage: getNeedsRetriage(jobRecord, profileVersion),
+  }));
+  const filtered =
+    typeof needsRetriage === "boolean"
+      ? decorated.filter((jobRecord) => jobRecord.needsRetriage === needsRetriage)
+      : decorated;
 
-    return [...filtered].sort((left, right) =>
-      triageRank(left.triageStatus) === triageRank(right.triageStatus)
-        ? right.updatedAt.localeCompare(left.updatedAt)
-        : triageRank(left.triageStatus) - triageRank(right.triageStatus)
-    );
-  };
+  return [...filtered].sort((left, right) => {
+    const leftRank = triageRank(left.triageStatus);
+    const rightRank = triageRank(right.triageStatus);
+    if (leftRank !== rightRank) {
+      return leftRank - rightRank;
+    }
+    if (leftRank === 0) {
+      const leftScore = toRankScore(left.rankScore);
+      const rightScore = toRankScore(right.rankScore);
+      if (leftScore !== null || rightScore !== null) {
+        if (leftScore === null) return 1;
+        if (rightScore === null) return -1;
+        if (leftScore !== rightScore) return rightScore - leftScore;
+      }
+      const leftRecency = toRecency(left);
+      const rightRecency = toRecency(right);
+      if (leftRecency !== rightRecency) {
+        return rightRecency.localeCompare(leftRecency);
+      }
+    }
+    return right.updatedAt.localeCompare(left.updatedAt);
+  });
+};
+
+export const createListJobsUseCase =
+  (dependencies: listJobsDeps) =>
+  async (input: listJobsInput = {}): Promise<job[]> =>
+    prepareJobs(dependencies, input);

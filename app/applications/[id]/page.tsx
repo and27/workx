@@ -13,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/src/lib/format";
 import { getUseCases } from "@/src/composition/usecases";
+import ApplicationJobDetail from "@/src/components/ApplicationJobDetail";
+import { saveJobAction } from "@/app/jobs/actions";
 import {
   priorityOptions,
   statusOptions,
@@ -28,14 +30,17 @@ type applicationDetailProps = {
 export default async function ApplicationDetailPage({
   params,
 }: applicationDetailProps) {
-  const { listApplicationLogs, getApplication } = await getUseCases();
+  const { listApplicationLogs, getApplication, getJob } = await getUseCases();
   const routeParams = await params;
   const application = await getApplication({ id: routeParams.id });
   if (!application) {
     notFound();
   }
 
-  const logs = await listApplicationLogs({ applicationId: application.id });
+  const [job, logs] = await Promise.all([
+    application.jobId ? getJob({ id: application.jobId }) : Promise.resolve(null),
+    listApplicationLogs({ applicationId: application.id }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -123,6 +128,22 @@ export default async function ApplicationDetailPage({
             </Button>
           </div>
         </form>
+
+        {job && (
+          <div className="mt-4 flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 p-3">
+            <div>
+              <p className="text-sm font-medium">Vacante asociada</p>
+              <p className="text-xs text-muted-foreground">
+                {job.role} · {job.company}
+              </p>
+            </div>
+            <ApplicationJobDetail
+              job={job}
+              saved={Boolean(application.jobId)}
+              action={saveJobAction}
+            />
+          </div>
+        )}
       </section>
 
       <section className="space-y-3">

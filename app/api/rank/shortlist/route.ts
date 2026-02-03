@@ -3,20 +3,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { getUseCases } from "@/src/composition/usecases";
 import { HOME_CACHE_PROFILE, HOME_CACHE_TAG } from "@/src/lib/cache-tags";
 
-type triageMode = "new" | "recent";
-
-const toMode = (value: unknown): triageMode =>
-  value === "recent" ? "recent" : "new";
-
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const mode = toMode(body?.mode);
-  const days =
-    typeof body?.days === "number" && body.days > 0 ? body.days : 14;
+  const limit =
+    typeof body?.limit === "number" && body.limit > 0 ? body.limit : undefined;
 
   try {
-    const { triageJobs } = await getUseCases();
-    const result = await triageJobs({ mode, days });
+    const { rankShortlist } = await getUseCases();
+    const result = await rankShortlist({ limit });
     if (!result.ok) {
       return NextResponse.json(
         { ok: false, error: result.error.message },
@@ -36,7 +30,7 @@ export async function POST(request: Request) {
         error:
           error instanceof Error
             ? error.message
-            : "No pudimos analizar trabajos.",
+            : "No pudimos rankear trabajos.",
       },
       { status: 500 }
     );

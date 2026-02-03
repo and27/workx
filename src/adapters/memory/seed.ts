@@ -94,6 +94,10 @@ const seedJobsBase = (data: {
   triagedAt?: isoDateTime | null;
   triageProvider?: "ollama" | "openai" | null;
   triageVersion?: number | null;
+  rankScore?: number | null;
+  rankReason?: string | null;
+  rankProvider?: "ollama" | "openai" | null;
+  rankVersion?: number | null;
   createdOffsetDays: number;
   updatedOffsetDays: number;
 }): job => ({
@@ -112,6 +116,10 @@ const seedJobsBase = (data: {
   triagedAt: data.triagedAt ?? null,
   triageProvider: data.triageProvider ?? null,
   triageVersion: data.triageVersion ?? null,
+  rankScore: data.rankScore ?? null,
+  rankReason: data.rankReason ?? null,
+  rankProvider: data.rankProvider ?? null,
+  rankVersion: data.rankVersion ?? null,
   publishedAt: data.publishedAt ?? null,
   createdAt: toIso(addDays(seedToday, data.createdOffsetDays)),
   updatedAt: toIso(addDays(seedToday, data.updatedOffsetDays)),

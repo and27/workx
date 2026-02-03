@@ -24,6 +24,10 @@ const makeJob = (overrides: Partial<job>): job => ({
   triagedAt: null,
   triageProvider: null,
   triageVersion: null,
+  rankScore: null,
+  rankReason: null,
+  rankProvider: null,
+  rankVersion: null,
   publishedAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -47,6 +51,12 @@ describe("createApplicationFromJob", () => {
         return { created: 0, updated: 0 };
       },
       async updateTriage() {
+        throw new Error("Not implemented");
+      },
+      async updateRank() {
+        throw new Error("Not implemented");
+      },
+      async create() {
         throw new Error("Not implemented");
       },
     };

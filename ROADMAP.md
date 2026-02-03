@@ -171,6 +171,56 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
+## Phase 3.1 – Performance & UX responsiveness 🟡 Planned
+
+**Goal:** Make the app feel fast and responsive under Supabase latency.
+
+**Delivers:**
+
+- Parallelized server queries in Home/Jobs/Applications detail.
+- Reduced duplicate queries (reuse results or lightweight queries).
+- Smaller payloads for list views (select only needed columns).
+- Safe caching/revalidation for frequently read lists.
+
+**Non-goals:**
+
+- Major UI redesign.
+- Background jobs or realtime subscriptions.
+
+**Exit criteria:**
+
+- Home/Jobs/Applications feel noticeably faster.
+- Fewer repository calls per page render.
+- No regressions in data freshness for critical actions.
+
+---
+
+## Phase 3.2 – Curation & Manual Capture (Producto) 🟡 Planned
+
+**Goal:** Improve curation quality and capture off-source opportunities without breaking the existing triage flow.
+
+**Delivers:**
+
+- Automatic ranking for `shortlist` jobs (score 0–100 + rationale).
+- Provider selection via environment variable (Ollama/OpenAI).
+- Manual job capture form (source = `Manual`).
+- Optional auto-triage for manual jobs when sufficient JD is provided.
+- UI: shortlist sorted by rank score with visible ranking reason.
+
+**Non-goals:**
+
+- Manual ranking (drag & drop).
+- Auto-apply workflows.
+- Multi-user personalization.
+
+**Exit criteria:**
+
+- Shortlist is ordered by rank score with an explainable reason.
+- Manual jobs can be created and optionally triaged.
+- Ranking respects triage status (only `shortlist` is ranked).
+
+---
+
 ## Phase 4 – Productivity Automation (Optional)
 
 **Goal:** Reduce follow-up overhead for a single user.

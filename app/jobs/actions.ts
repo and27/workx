@@ -1,7 +1,8 @@
 "use server";
 
 import { getUseCases } from "@/src/composition/usecases";
-import { revalidatePath } from "next/cache";
+import { HOME_CACHE_PROFILE, HOME_CACHE_TAG } from "@/src/lib/cache-tags";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export type saveJobState = {
   ok: boolean;
@@ -25,6 +26,7 @@ export async function saveJobAction(
 
   revalidatePath("/jobs");
   revalidatePath("/applications");
+  revalidateTag(HOME_CACHE_TAG, HOME_CACHE_PROFILE);
 
   return { ok: true, message: "Postulacion guardada." };
 }

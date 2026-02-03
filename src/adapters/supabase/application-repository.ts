@@ -6,6 +6,7 @@ import { priority } from "@/src/domain/types/priority";
 import {
   applicationRepository,
   applicationUpdatePatch,
+  countApplicationsQuery,
   listApplicationsQuery,
 } from "@/src/ports/application-repository";
 
@@ -63,8 +64,16 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
   async list(query: listApplicationsQuery) {
     let builder = supabase
       .from("applications")
-      .select("*")
+      .select(
+        "id,company,role,status,priority,next_action_at,source,notes,created_at,updated_at,job_id"
+      )
       .order("updated_at", { ascending: false });
+    if (query.jobIds) {
+      if (query.jobIds.length === 0) {
+        return [];
+      }
+      builder = builder.in("job_id", query.jobIds);
+    }
     const search = query.search?.trim();
     if (search) {
       builder = builder.or(
@@ -77,6 +86,9 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
     if (query.priority) {
       builder = builder.eq("priority", query.priority);
     }
+    if (query.updatedAfter) {
+      builder = builder.gte("updated_at", query.updatedAfter);
+    }
 
     const { data, error } = await builder;
     if (error) {
@@ -84,10 +96,45 @@ export const createSupabaseApplicationRepository = (): applicationRepository => 
     }
     return (data ?? []).map((row) => toApplication(row as applicationRow));
   },
+  async count(query: countApplicationsQuery) {
+    let builder = supabase
+      .from("applications")
+      .select("id", { count: "exact", head: true });
+    if (query.statusIn) {
+      if (query.statusIn.length === 0) return 0;
+      builder = builder.in("status", query.statusIn);
+    }
+    if (query.updatedAfter) {
+      builder = builder.gte("updated_at", query.updatedAfter);
+    }
+    if (query.overdueDate) {
+      builder = builder.lt("next_action_at", query.overdueDate);
+    }
+    const { count, error } = await builder;
+    if (error) {
+      throw new Error(error.message);
+    }
+    return count ?? 0;
+  },
+  async getLatestId() {
+    const { data, error } = await supabase
+      .from("applications")
+      .select("id")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data?.id ?? null;
+  },
   async getById(query: { id: string }) {
     const { data, error } = await supabase
       .from("applications")
-      .select("*")
+      .select(
+        "id,company,role,status,priority,next_action_at,source,notes,created_at,updated_at,job_id"
+      )
       .eq("id", query.id)
       .maybeSingle();
 

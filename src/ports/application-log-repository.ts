@@ -2,6 +2,7 @@ import { applicationLogEntry } from "@/src/domain/entities/application-log-entry
 
 export type listApplicationLogsQuery = {
   applicationId: string;
+  limit?: number;
 };
 
 export interface applicationLogRepository {

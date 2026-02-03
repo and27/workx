@@ -24,11 +24,15 @@ const toLogEntry = (row: applicationLogRow): applicationLogEntry => ({
 export const createSupabaseApplicationLogRepository =
   (): applicationLogRepository => ({
     async listByApplicationId(query: listApplicationLogsQuery) {
-      const { data, error } = await supabase
+      let builder = supabase
         .from("application_logs")
         .select("*")
         .eq("application_id", query.applicationId)
         .order("created_at", { ascending: false });
+      if (typeof query.limit === "number" && Number.isFinite(query.limit)) {
+        builder = builder.limit(Math.max(0, Math.floor(query.limit)));
+      }
+      const { data, error } = await builder;
 
       if (error) {
         throw new Error(error.message);

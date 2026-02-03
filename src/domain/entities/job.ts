@@ -18,6 +18,10 @@ export type job = {
   triagedAt: isoDateTime | null;
   triageProvider: triageProvider | null;
   triageVersion: number | null;
+  rankScore: number | null;
+  rankReason: string | null;
+  rankProvider: triageProvider | null;
+  rankVersion: number | null;
   needsRetriage?: boolean;
   publishedAt: isoDateTime | null;
   createdAt: isoDateTime;

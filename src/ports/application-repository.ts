@@ -8,6 +8,14 @@ export type listApplicationsQuery = {
   search?: string;
   status?: applicationStatus;
   priority?: priority;
+  updatedAfter?: isoDateTime;
+  jobIds?: string[];
+};
+
+export type countApplicationsQuery = {
+  statusIn?: applicationStatus[];
+  updatedAfter?: isoDateTime;
+  overdueDate?: dateOnly;
 };
 
 export type applicationUpdatePatch = {
@@ -20,6 +28,8 @@ export type applicationUpdatePatch = {
 
 export interface applicationRepository {
   list(query: listApplicationsQuery): Promise<application[]>;
+  count(query: countApplicationsQuery): Promise<number>;
+  getLatestId(): Promise<string | null>;
   getById(query: { id: string }): Promise<application | null>;
   create(query: { application: application }): Promise<void>;
   update(query: { id: string; patch: applicationUpdatePatch }): Promise<application>;

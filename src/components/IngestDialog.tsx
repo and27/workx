@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
-type ingestSource = "all" | "Remotive" | "WWR" | "Web3";
+type ingestSource = "all" | "Remotive" | "WWR" | "Web3" | "Remote OK";
 
 type ingestPayload = {
   ok: boolean;
@@ -150,6 +151,7 @@ export default function IngestDialog() {
                     <SelectItem value="Remotive">Remotive</SelectItem>
                     <SelectItem value="WWR">WWR</SelectItem>
                     <SelectItem value="Web3">Web3</SelectItem>
+                    <SelectItem value="Remote OK">Remote OK</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -168,6 +170,16 @@ export default function IngestDialog() {
                   className="mt-1"
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                ¿Quieres agregar un job manual?{" "}
+                <Link
+                  href="/manual"
+                  onClick={handleClose}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  Ir a crear job
+                </Link>
+              </p>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-border p-4">
