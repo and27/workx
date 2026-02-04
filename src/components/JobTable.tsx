@@ -268,20 +268,7 @@ export default function JobTable({
                             )}
                           </span>
                         )}
-                        {variant === "list" && job.sourceUrl ? (
-                          <a
-                            href={job.sourceUrl}
-                            target="_blank"
-                            rel="noopener"
-                            className="underline-offset-4 hover:underline truncate"
-                            onClick={stopRowClick}
-                            onKeyDown={stopRowClick}
-                          >
-                            {job.role}
-                          </a>
-                        ) : (
-                          job.role
-                        )}
+                        {job.role}
                       </div>
                       {isShortlist && job.rankScore !== null && (
                         <div className="text-xs text-muted-foreground">
