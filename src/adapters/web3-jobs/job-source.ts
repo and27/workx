@@ -23,7 +23,7 @@ const BASE_URL = "https://web3.career/api/v1";
 const isDebugEnabled = () => process.env.WEB3_DEBUG?.trim() === "true";
 const getTag = () => {
   const tag = process.env.WEB3_TAG?.trim();
-  return tag && tag.length > 0 ? tag : "front-end";
+  return tag && tag.length > 0 ? tag : "react";
 };
 
 const toPublishedAt = (job: web3Job) => {
@@ -71,13 +71,16 @@ const toSourceRecord = (job: web3Job): jobSourceRecord | null => {
   };
 };
 
+const MAX_LIMIT = 100;
+
 const buildUrl = (token: string, tag: string, limit?: number) => {
   const url = new URL(BASE_URL);
   url.searchParams.set("token", token);
   url.searchParams.set("remote", "true");
   url.searchParams.set("tag", tag);
   if (limit) {
-    url.searchParams.set("limit", String(limit));
+    const capped = Math.min(limit, MAX_LIMIT);
+    url.searchParams.set("limit", String(capped));
   }
   return url.toString();
 };
