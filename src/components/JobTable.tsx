@@ -366,6 +366,7 @@ export default function JobTable({
             open
             saved={savedSet.has(selectedJob.id)}
             action={action}
+            fetchOnOpen
             onClose={handleClose}
           />
         </Suspense>
