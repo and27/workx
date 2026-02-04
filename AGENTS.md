@@ -152,6 +152,11 @@ A PR is "done" only when:
   - `@'` ... ` '@` (ensures correct markdown formatting).
 - Every PR must reference its issue and include `Closes #NN` in the PR body.
 - When adding DB fields, update both `supabase/schema.sql` and add a migration in `supabase/migrations/`.
+- Hot-file merge hygiene (avoid regressions):
+  - Prefer one PR at a time per hot file (e.g., `JobTable.tsx`).
+  - Rebase or merge `dev` before opening a PR and verify the final diff.
+  - Add a minimal smoke check for any UI touchpoints you changed.
+  - Use `rg`/`git diff dev...branch` to confirm key UI elements remain.
 
 ## Roadmap Hygiene
 
