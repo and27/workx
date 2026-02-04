@@ -44,6 +44,14 @@ If you want to ingest Web3 jobs, set:
 
 ```bash
 WEB3_CAREER_TOKEN=your_web3_token
+WEB3_TAG=react
+WEB3_DEBUG=false
+```
+
+To enforce a daily ingest cap, set:
+
+```bash
+INGEST_DAILY_CAP=2
 ```
 
 Apply the schema in `supabase/schema.sql` to your Supabase project.
@@ -74,6 +82,8 @@ Or ingest from Web3:
 curl "http://localhost:3000/api/ingest?source=Web3&limit=50"
 ```
 
+Note: Web3 API max limit is 100 (higher values are capped).
+
 Or ingest from Remote OK:
 
 ```bash
@@ -89,6 +99,12 @@ curl "http://localhost:3000/api/ingest?source=all&limit=50"
 ```
 
 This will upsert jobs by `externalId` and make them available in the Jobs page.
+
+Check ingest status (daily cap + last runs):
+
+```bash
+curl "http://localhost:3000/api/ingest/status"
+```
 
 Legacy endpoints still work:
 
