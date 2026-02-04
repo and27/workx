@@ -9,6 +9,12 @@ export type {
 } from "@/src/services/usecases/list-jobs-page";
 export type { ingestJobsInput } from "@/src/services/usecases/ingest-jobs";
 export type {
+  ingestJobsWithCapInput,
+  ingestJobsWithCapOutput,
+  ingestJobsWithCapDeps,
+} from "@/src/services/usecases/ingest-jobs-with-cap";
+export type { ingestStatus } from "@/src/services/usecases/ingest-status";
+export type {
   triageJobsInput,
   triageJobsDeps,
   triageJobsOutput,
@@ -49,6 +55,8 @@ export { createListJobsUseCase } from "@/src/services/usecases/list-jobs";
 export { createListJobsPageUseCase } from "@/src/services/usecases/list-jobs-page";
 export { createListJobSourcesUseCase } from "@/src/services/usecases/list-job-sources";
 export { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
+export { createIngestJobsWithCapUseCase } from "@/src/services/usecases/ingest-jobs-with-cap";
+export { createGetIngestStatusUseCase } from "@/src/services/usecases/ingest-status";
 export { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
 export { createRankShortlistUseCase } from "@/src/services/usecases/rank-shortlist";
 export { createGetApplicationUseCase } from "@/src/services/usecases/get-application";
