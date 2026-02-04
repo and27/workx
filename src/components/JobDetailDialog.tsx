@@ -135,8 +135,8 @@ export default function JobDetailDialog({
           onClick={(event) => event.stopPropagation()}
         >
           <div className="flex items-start justify-between gap-4 border-b border-border p-4">
-            <div className="space-y-1">
-              <h2 id={titleId} className="text-lg font-semibold">
+            <div className="min-w-0 space-y-1">
+              <h2 id={titleId} className="text-lg font-semibold truncate">
                 {activeJob.role}
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -152,6 +152,16 @@ export default function JobDetailDialog({
           </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold">Descripcion</h3>
+              <div
+                id={descriptionId}
+                className="max-h-64 overflow-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground"
+              >
+                {description}
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               {activeJob.tags.map((tag) => (
                 <Badge key={tag} variant="outline">
@@ -199,15 +209,6 @@ export default function JobDetailDialog({
               </div>
             )}
 
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold">Descripcion</h3>
-              <div
-                id={descriptionId}
-                className="max-h-64 overflow-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground"
-              >
-                {description}
-              </div>
-            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
