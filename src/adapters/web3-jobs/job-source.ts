@@ -20,16 +20,7 @@ type web3Job = {
 
 const SOURCE = "Web3";
 const BASE_URL = "https://web3.career/api/v1";
-const includeKeywords = ["frontend", "front-end", "react"];
-
-const toSearchText = (value: string) => value.toLowerCase();
-
-const shouldInclude = (record: jobSourceRecord) => {
-  const haystack = [record.role, record.company, ...record.tags]
-    .map(toSearchText)
-    .join(" ");
-  return includeKeywords.some((keyword) => haystack.includes(keyword));
-};
+const isDebugEnabled = () => process.env.WEB3_DEBUG?.trim() === "true";
 
 const toPublishedAt = (job: web3Job) => {
   if (typeof job.date_epoch === "number" && Number.isFinite(job.date_epoch)) {
@@ -102,18 +93,33 @@ export const createWeb3JobSource = (): jobSource => ({
     }
 
     const payload = (await response.json()) as unknown;
-    const jobs = Array.isArray(payload) ? payload[2] : null;
+    let jobs: unknown = null;
+    if (Array.isArray(payload)) {
+      jobs = payload[2];
+    } else if (payload && typeof payload === "object") {
+      const candidate = payload as { jobs?: unknown; data?: unknown };
+      jobs = candidate.jobs ?? candidate.data ?? null;
+    }
+
     if (!Array.isArray(jobs)) {
       console.warn("[Web3] Unexpected payload shape.", {
-        hasPayload: Boolean(payload),
+        type: typeof payload,
+        isArray: Array.isArray(payload),
       });
       return [];
     }
 
     const records = jobs
       .map(toSourceRecord)
-      .filter((record): record is jobSourceRecord => Boolean(record))
-      .filter(shouldInclude);
+      .filter((record): record is jobSourceRecord => Boolean(record));
+
+    if (isDebugEnabled()) {
+      console.info("[Web3] Ingest counts", {
+        raw: jobs.length,
+        mapped: records.length,
+        limit: query.limit ?? null,
+      });
+    }
 
     const limit = typeof query.limit === "number" ? query.limit : undefined;
     return limit ? records.slice(0, limit) : records;
