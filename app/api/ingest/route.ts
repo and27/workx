@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { getUseCases } from "@/src/composition/usecases";
+import { isIngestCapError } from "@/src/services/usecases/ingest-jobs-with-cap";
 import { HOME_CACHE_PROFILE, HOME_CACHE_TAG } from "@/src/lib/cache-tags";
 
 export async function GET(request: Request) {
@@ -13,12 +14,13 @@ export async function GET(request: Request) {
   const source = sourceParam?.trim() || undefined;
 
   try {
-    const { ingestJobs } = await getUseCases();
-    const result = await ingestJobs({ source, limit: safeLimit });
+    const { ingestJobsWithCap } = await getUseCases();
+    const result = await ingestJobsWithCap({ source, limit: safeLimit });
     if (!result.ok) {
+      const status = isIngestCapError(result.error) ? 429 : 500;
       return NextResponse.json(
-        { ok: false, error: "No pudimos ingestar trabajos." },
-        { status: 500 }
+        { ok: false, error: result.error.message },
+        { status }
       );
     }
     revalidateTag(HOME_CACHE_TAG, HOME_CACHE_PROFILE);
