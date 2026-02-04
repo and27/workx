@@ -139,10 +139,10 @@ export default function JobDetailDialog({
               <h2 id={titleId} className="text-lg font-semibold truncate">
                 {activeJob.role}
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground truncate">
                 {activeJob.company} • {activeJob.location}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground truncate">
                 {activeJob.seniority} • {activeJob.source} • {publishedText}
               </p>
             </div>
