@@ -38,7 +38,9 @@ export default async function ApplicationDetailPage({
   }
 
   const [job, logs] = await Promise.all([
-    application.jobId ? getJob({ id: application.jobId }) : Promise.resolve(null),
+    application.jobId
+      ? getJob({ id: application.jobId })
+      : Promise.resolve(null),
     listApplicationLogs({ applicationId: application.id }),
   ]);
 
@@ -151,26 +153,27 @@ export default async function ApplicationDetailPage({
           <h2 className="text-lg font-semibold">Historial</h2>
           <Badge variant="outline">{logs.length} eventos</Badge>
         </div>
-        <div className="rounded-lg border border-border bg-card">
-          <ul className="divide-y divide-border">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <ol className="relative border-l border-border pl-10">
             {logs.map((entry) => (
-              <li key={entry.id} className="space-y-2 px-4 py-3">
-                <div className="flex items-center justify-between">
+              <li key={entry.id} className="relative pb-6 last:pb-0">
+                <span className="absolute -left-5 top-1.5 flex size-3 items-center justify-center rounded-full border border-foreground bg-muted" />
+                <div className="flex items-start justify-between gap-4">
                   <p className="text-sm font-medium">{entry.message}</p>
                   <span className="text-xs text-muted-foreground">
                     {formatDateTime(entry.createdAt)}
                   </span>
                 </div>
-                <Separator />
+                <Separator className="my-2" />
                 <p className="text-xs text-muted-foreground">{entry.type}</p>
               </li>
             ))}
             {logs.length === 0 && (
-              <li className="px-4 py-6 text-sm text-muted-foreground">
+              <li className="text-sm text-muted-foreground">
                 Sin actividad registrada.
               </li>
             )}
-          </ul>
+          </ol>
         </div>
       </section>
     </div>

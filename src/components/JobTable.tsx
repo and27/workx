@@ -4,7 +4,14 @@ import { useMemo, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ExternalLink,
+  RefreshCw,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,6 +25,7 @@ import JobDetailDialog from "@/src/components/JobDetailDialog";
 import type { job } from "@/src/domain/entities/job";
 import { formatRelativeDate } from "@/src/lib/format";
 import type { saveJobState } from "@/app/jobs/actions";
+import { Button } from "@/components/ui/button";
 
 type jobTableVariant = "home" | "list";
 
@@ -160,11 +168,43 @@ export default function JobTable({
                 }}
               >
                 <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
-                  <JobSaveForm
-                    jobId={job.id}
-                    saved={savedSet.has(job.id)}
-                    action={action}
-                  />
+                  <div className="flex items-center gap-2">
+                    <JobSaveForm
+                      jobId={job.id}
+                      saved={savedSet.has(job.id)}
+                      action={action}
+                    />
+                    {variant === "list" && (
+                      <Button
+                        asChild={Boolean(job.sourceUrl)}
+                        variant="outline"
+                        size="icon-sm"
+                        disabled={!job.sourceUrl}
+                        title={
+                          job.sourceUrl ? "Abrir vacante" : "Sin link de vacante"
+                        }
+                        aria-label={
+                          job.sourceUrl ? "Abrir vacante" : "Sin link de vacante"
+                        }
+                      >
+                        {job.sourceUrl ? (
+                          <a
+                            href={job.sourceUrl}
+                            target="_blank"
+                            rel="noopener"
+                            onClick={stopRowClick}
+                            onKeyDown={stopRowClick}
+                          >
+                            <ExternalLink />
+                          </a>
+                        ) : (
+                          <span>
+                            <ExternalLink />
+                          </span>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="font-medium max-w-xs overflow-hidden">
                   <div className="space-y-0">
@@ -228,20 +268,7 @@ export default function JobTable({
                             )}
                           </span>
                         )}
-                        {variant === "list" && job.sourceUrl ? (
-                          <a
-                            href={job.sourceUrl}
-                            target="_blank"
-                            rel="noopener"
-                            className="underline-offset-4 hover:underline truncate"
-                            onClick={stopRowClick}
-                            onKeyDown={stopRowClick}
-                          >
-                            {job.role}
-                          </a>
-                        ) : (
-                          job.role
-                        )}
+                        {job.role}
                       </div>
                       {isShortlist && job.rankScore !== null && (
                         <div className="text-xs text-muted-foreground">

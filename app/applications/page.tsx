@@ -1,17 +1,7 @@
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import ApplicationsFilters from "@/src/components/ApplicationsFilters";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ApplicationsTable from "@/src/components/ApplicationsTable";
 import { applicationStatus } from "@/src/domain/types/application-status";
 import { priority } from "@/src/domain/types/priority";
-import { formatDate } from "@/src/lib/format";
 import { getUseCases } from "@/src/composition/usecases";
 
 type applicationsPageProps = {
@@ -64,67 +54,7 @@ export default async function ApplicationsPage({
             initialPriority={(rawPriority ?? "all") as priority | "all"}
           />
         </div>
-        <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead>Empresa</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Prioridad</TableHead>
-              <TableHead>Siguiente accion</TableHead>
-              <TableHead>Fuente</TableHead>
-              <TableHead>Actualizado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applications.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <span
-                    className="block max-w-[180px] truncate"
-                    title={item.company}
-                  >
-                    {item.company}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/applications/${item.id}`}
-                    className="block max-w-[220px] truncate text-sm font-medium hover:underline"
-                    title={item.role}
-                  >
-                    {item.role}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{item.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{item.priority}</Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {item.nextActionAt ?? "-"}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {item.source}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {formatDate(item.updatedAt)}
-                </TableCell>
-              </TableRow>
-            ))}
-            {applications.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="py-6 text-center text-sm text-muted-foreground"
-                >
-                  Sin postulaciones para mostrar.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <ApplicationsTable applications={applications} />
       </section>
     </div>
   );
