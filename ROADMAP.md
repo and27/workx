@@ -1,6 +1,6 @@
 # ROADMAP – Workx
 
-Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
+Status: Phase 3 in progress; Phase 3.1 + 3.2 complete; Phase 2.3 in progress.
 
 ## Phase 0 – Execution UI (Portfolio Core) ✅
 
@@ -102,6 +102,30 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
+## Phase 2.3 – Ingest Reliability & Limits (Epic 5) 🟡 In Progress
+
+**Goal:** Reduce ingest ambiguity and rate-limit risk without adding automation.
+
+**Delivers:**
+
+- Daily ingest cap (server enforced).
+- UI indicator for daily cap usage.
+- Ingest run tracking endpoint (`/api/ingest/status`).
+- Web3 adapter diagnostics (debug counts, date ranges).
+
+**Non-goals:**
+
+- Scheduled/cron ingestion.
+- Full scraping fallback.
+- Automatic source health retries.
+
+**Exit criteria:**
+
+- User can see remaining ingest capacity.
+- Ingest runs expose basic health signals per source.
+
+---
+
 ## Phase 2.1 – Daily Decision UX (Closure) ✅
 
 **Goal:** Remove ambiguity and friction from daily decisions.
@@ -171,7 +195,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
-## Phase 3.1 – Performance & UX responsiveness 🟡 Planned
+## Phase 3.1 – Performance & UX responsiveness ✅ Complete
 
 **Goal:** Make the app feel fast and responsive under Supabase latency.
 
@@ -195,7 +219,7 @@ Status: Phase 0 complete; current work is post-Phase 0 (Phase 3 in progress).
 
 ---
 
-## Phase 3.2 – Curation & Manual Capture (Producto) ✅
+## Phase 3.2 – Curation & Manual Capture (Producto) ✅ Complete
 
 **Goal:** Improve curation quality and capture off-source opportunities without breaking the existing triage flow.
 

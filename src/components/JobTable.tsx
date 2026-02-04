@@ -5,7 +5,14 @@ import type { KeyboardEvent, MouseEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, ArrowUpDown, Check, RefreshCw } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ExternalLink,
+  RefreshCw,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -98,6 +105,10 @@ export default function JobTable({
 
   const handleOpen = (jobId: string) => setActiveJobId(jobId);
   const handleClose = () => setActiveJobId(null);
+  const handleOpenVacancy = (url?: string | null) => {
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const emptyColSpan = variant === "home" ? 5 : 7;
   const sortKey = searchParams.get("sort");
@@ -189,11 +200,30 @@ export default function JobTable({
                 }}
               >
                 <TableCell onClick={stopRowClick} onKeyDown={stopRowClick}>
-                  <JobSaveForm
-                    jobId={job.id}
-                    saved={savedSet.has(job.id)}
-                    action={action}
-                  />
+                  <div className="flex items-center gap-2">
+                    <JobSaveForm
+                      jobId={job.id}
+                      saved={savedSet.has(job.id)}
+                      action={action}
+                    />
+                    {variant === "list" && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={() => handleOpenVacancy(job.sourceUrl)}
+                        disabled={!job.sourceUrl}
+                        title={
+                          job.sourceUrl
+                            ? "Abrir vacante"
+                            : "Vacante sin link"
+                        }
+                      >
+                        <ExternalLink />
+                        <span className="sr-only">Abrir vacante</span>
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="font-medium max-w-xs overflow-hidden">
                   <div className="space-y-0">
@@ -257,20 +287,7 @@ export default function JobTable({
                             )}
                           </span>
                         )}
-                        {variant === "list" && job.sourceUrl ? (
-                          <a
-                            href={job.sourceUrl}
-                            target="_blank"
-                            rel="noopener"
-                            className="underline-offset-4 hover:underline truncate"
-                            onClick={stopRowClick}
-                            onKeyDown={stopRowClick}
-                          >
-                            {job.role}
-                          </a>
-                        ) : (
-                          job.role
-                        )}
+                        {job.role}
                       </div>
                       {isShortlist && job.rankScore !== null && (
                         <div className="text-xs text-muted-foreground">
@@ -349,6 +366,7 @@ export default function JobTable({
             open
             saved={savedSet.has(selectedJob.id)}
             action={action}
+            fetchOnOpen
             onClose={handleClose}
           />
         </Suspense>

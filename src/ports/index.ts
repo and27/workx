@@ -23,6 +23,11 @@ export type {
   jobSourceRecord,
 } from "@/src/ports/job-source";
 export type {
+  ingestRunRepository,
+  ingestRunRecord,
+  countIngestRunsQuery,
+} from "@/src/ports/ingest-run-repository";
+export type {
   jobTriageDecision,
   jobTriagePort,
 } from "@/src/ports/job-triage";

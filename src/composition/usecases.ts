@@ -12,6 +12,8 @@ import { createListJobsPageUseCase } from "@/src/services/usecases/list-jobs-pag
 import { createListJobSourcesUseCase } from "@/src/services/usecases/list-job-sources";
 import { updateApplicationUseCase } from "@/src/services/usecases/update-application";
 import { createIngestJobsUseCase } from "@/src/services/usecases/ingest-jobs";
+import { createIngestJobsWithCapUseCase } from "@/src/services/usecases/ingest-jobs-with-cap";
+import { createGetIngestStatusUseCase } from "@/src/services/usecases/ingest-status";
 import { createArchiveApplicationUseCase } from "@/src/services/usecases/archive-application";
 import { createTriageJobsUseCase } from "@/src/services/usecases/triage-jobs";
 import { createRankShortlistUseCase } from "@/src/services/usecases/rank-shortlist";
@@ -50,6 +52,14 @@ async function buildUseCases() {
     ingestJobs: createIngestJobsUseCase({
       jobSource: repositories.jobSource,
       jobRepository: repositories.jobRepository,
+    }),
+    ingestJobsWithCap: createIngestJobsWithCapUseCase({
+      jobSource: repositories.jobSource,
+      jobRepository: repositories.jobRepository,
+      ingestRunRepository: repositories.ingestRunRepository,
+    }),
+    getIngestStatus: createGetIngestStatusUseCase({
+      ingestRunRepository: repositories.ingestRunRepository,
     }),
     triageJobs: createTriageJobsUseCase({
       jobRepository: repositories.jobRepository,
