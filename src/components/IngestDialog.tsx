@@ -21,6 +21,17 @@ type ingestPayload = {
   fetched?: number;
   created?: number;
   updated?: number;
+  used?: number;
+  limit?: number;
+  remaining?: number;
+  error?: string;
+};
+
+type ingestStatusPayload = {
+  ok: boolean;
+  used?: number;
+  limit?: number;
+  remaining?: number;
   error?: string;
 };
 
@@ -34,6 +45,10 @@ export default function IngestDialog() {
   const [source, setSource] = useState<ingestSource>("all");
   const [limitInput, setLimitInput] = useState(String(DEFAULT_LIMIT));
   const [pending, setPending] = useState(false);
+  const [usage, setUsage] = useState<{ used: number; limit: number } | null>(
+    null
+  );
+  const [loadingUsage, setLoadingUsage] = useState(false);
 
   const limitValue = useMemo(() => {
     const parsed = Number(limitInput);
@@ -53,10 +68,43 @@ export default function IngestDialog() {
     }
   }, [open]);
 
+  const fetchUsage = async () => {
+    setLoadingUsage(true);
+    try {
+      const response = await fetch("/api/ingest/status");
+      const payload = (await response.json()) as ingestStatusPayload;
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error ?? "No pudimos cargar el estado.");
+      }
+      if (typeof payload.used === "number" && typeof payload.limit === "number") {
+        setUsage({ used: payload.used, limit: payload.limit });
+      }
+    } catch {
+      setUsage(null);
+    } finally {
+      setLoadingUsage(false);
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      fetchUsage();
+    }
+  }, [open]);
+
   const handleClose = () => setOpen(false);
 
   const handleIngest = async () => {
     if (pending) return;
+    const limitReached =
+      usage && usage.limit > 0 && usage.used >= usage.limit;
+    if (limitReached) {
+      toast({
+        title: `Limite diario alcanzado (${usage.used}/${usage.limit}).`,
+        variant: "destructive",
+      });
+      return;
+    }
     if (!limitValue) {
       toast({
         title: "Limite invalido.",
@@ -83,6 +131,11 @@ export default function IngestDialog() {
         description: `Nuevos: ${payload.created ?? 0} • Actualizados: ${payload.updated ?? 0}`,
         variant: "success",
       });
+      if (typeof payload.used === "number" && typeof payload.limit === "number") {
+        setUsage({ used: payload.used, limit: payload.limit });
+      } else {
+        fetchUsage();
+      }
       handleClose();
       router.refresh();
     } catch (error) {
@@ -120,6 +173,20 @@ export default function IngestDialog() {
                 <p className="text-xs text-muted-foreground">
                   Selecciona la fuente y el limite para traer trabajos.
                 </p>
+                <div className="text-xs text-muted-foreground">
+                  {loadingUsage ? (
+                    "Cargando estado..."
+                  ) : usage ? (
+                    `Ingestas hoy: ${usage.used}/${usage.limit}`
+                  ) : (
+                    "Estado de ingestas no disponible"
+                  )}
+                </div>
+                {usage && usage.limit > 0 && usage.used >= usage.limit && (
+                  <p className="text-xs text-amber-600">
+                    Limite diario alcanzado.
+                  </p>
+                )}
               </div>
               <Button
                 type="button"
@@ -195,7 +262,10 @@ export default function IngestDialog() {
                 type="button"
                 size="sm"
                 onClick={handleIngest}
-                disabled={pending}
+                disabled={
+                  pending ||
+                  (usage ? usage.limit > 0 && usage.used >= usage.limit : false)
+                }
               >
                 {pending ? "Ingestando..." : "Ingestar"}
               </Button>

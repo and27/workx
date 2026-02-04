@@ -1,5 +1,6 @@
 import { createMemoryApplicationLogRepository } from "@/src/adapters/memory/application-log-repository";
 import { createMemoryApplicationRepository } from "@/src/adapters/memory/application-repository";
+import { createMemoryIngestRunRepository } from "@/src/adapters/memory/ingest-run-repository";
 import { createMemoryJobRepository } from "@/src/adapters/memory/job-repository";
 import {
   seedApplicationLogs,
@@ -28,6 +29,7 @@ const createMemoryRepositories = () => {
     ({
       applications: [...seedApplications],
       applicationLogs: [...seedApplicationLogs],
+      ingestRuns: [],
       jobs: [...seedJobs],
     } satisfies memoryStore);
 
@@ -38,6 +40,7 @@ const createMemoryRepositories = () => {
   return {
     applicationRepository: createMemoryApplicationRepository(store),
     applicationLogRepository: createMemoryApplicationLogRepository(store),
+    ingestRunRepository: createMemoryIngestRunRepository(store),
     jobRepository: createMemoryJobRepository(store),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
@@ -62,10 +65,14 @@ export async function getRepositories() {
   const { createSupabaseJobRepository } = await import(
     "@/src/adapters/supabase/job-repository"
   );
+  const { createSupabaseIngestRunRepository } = await import(
+    "@/src/adapters/supabase/ingest-run-repository"
+  );
 
   return {
     applicationRepository: createSupabaseApplicationRepository(),
     applicationLogRepository: createSupabaseApplicationLogRepository(),
+    ingestRunRepository: createSupabaseIngestRunRepository(),
     jobRepository: createSupabaseJobRepository(),
     jobSource: createJobSourceRouter([
       { source: "Remotive", adapter: createRemotiveJobSource() },
