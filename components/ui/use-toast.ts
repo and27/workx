@@ -126,10 +126,10 @@ function dispatch(action: action) {
   });
 }
 
-type toastInput = Omit<ToastProps, "id">;
+type toastInput = Omit<ToastProps, "id"> & { id?: string };
 
-function toast({ ...props }: toastInput) {
-  const id = genId();
+function toast({ id: inputId, ...props }: toastInput) {
+  const id = inputId ?? genId();
 
   const update = (props: ToastProps) =>
     dispatch({
