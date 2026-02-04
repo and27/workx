@@ -243,6 +243,11 @@ Status: Phase 3 in progress; Phase 3.1 + 3.2 complete; Phase 2.3 in progress.
 - Manual jobs can be created and optionally triaged.
 - Ranking respects triage status (only `shortlist` is ranked).
 
+**Status update (2026-02-03):**
+- ✅ Ranking for shortlist jobs (0–100 + reason).
+- ✅ Provider selection via env.
+- ✅ Manual job capture page + optional auto-triage.
+
 ---
 
 ## Phase 4 – Productivity Automation (Optional)
