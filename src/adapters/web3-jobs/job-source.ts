@@ -137,6 +137,37 @@ const summarizePublishedAt = (records: jobSourceRecord[]) => {
   };
 };
 
+const normalizeApplyUrl = (value: string) => {
+  try {
+    const parsed = new URL(value);
+    parsed.hash = "";
+    const params = parsed.searchParams;
+    for (const key of Array.from(params.keys())) {
+      const lower = key.toLowerCase();
+      if (lower === "ref" || lower === "source" || lower.startsWith("utm_")) {
+        params.delete(key);
+      }
+    }
+    parsed.search = params.toString();
+    return parsed.toString();
+  } catch {
+    return value;
+  }
+};
+
+const dedupeRecords = (records: jobSourceRecord[]) => {
+  const seen = new Set<string>();
+  const unique: jobSourceRecord[] = [];
+  for (const record of records) {
+    const normalizedUrl = normalizeApplyUrl(record.sourceUrl);
+    const key = `${normalizedUrl}::${record.role.toLowerCase()}::${record.company.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(record);
+  }
+  return unique;
+};
+
 export const createWeb3JobSource = (): jobSource => ({
   list: async (query = {}) => {
     if (query.source && query.source !== SOURCE) return [];
@@ -180,19 +211,23 @@ export const createWeb3JobSource = (): jobSource => ({
     const records = jobs
       .map(toSourceRecord)
       .filter((record): record is jobSourceRecord => Boolean(record));
+    const uniqueRecords = dedupeRecords(records);
 
     if (isDebugEnabled()) {
+      const deduped = records.length - uniqueRecords.length;
       console.info("[Web3] Ingest counts", {
         raw: jobs.length,
         mapped: records.length,
+        deduped,
+        unique: uniqueRecords.length,
         limit: query.limit ?? null,
         tag,
-        ...summarizePublishedAt(records),
+        ...summarizePublishedAt(uniqueRecords),
       });
     }
 
     const limit = typeof query.limit === "number" ? query.limit : undefined;
-    const ordered = records.slice().sort(sortByPublishedAtDesc);
+    const ordered = uniqueRecords.slice().sort(sortByPublishedAtDesc);
     return limit ? ordered.slice(0, limit) : ordered;
   },
 });
